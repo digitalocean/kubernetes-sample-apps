@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+CLUSTER="example"
+doctl k8s cluster delete ${CLUSTER}

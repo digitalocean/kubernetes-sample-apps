@@ -1,0 +1,33 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: doks-example
+  annotations:
+    service.beta.kubernetes.io/do-loadbalancer-protocol: "http"
+spec:
+  type: LoadBalancer
+  selector:
+    app: doks-example
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: doks-example
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: doks-example
+    spec:
+      containers:
+      - name: nginx
+        image: snormore/doks-example
+        ports:
+        - containerPort: 80
+          protocol: TCP

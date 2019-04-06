@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>DOKS Getting Started</title>
+        <link href="style.css" type="text/css" rel="stylesheet" />
+    </head>
+    <body>
+        <img src="do.png" />
+        <h1>Congratulations, you deployed your first workload!</h1>
+        <pre>
+kind: Service
+apiVersion: v1
+metadata:
+    name: doks-example
+    annotations:
+    service.beta.kubernetes.io/do-loadbalancer-protocol: "http"
+spec:
+    type: LoadBalancer
+    selector:
+    app: doks-example
+    ports:
+    - name: http
+        protocol: TCP
+        port: 80
+        targetPort: 80
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+    name: doks-example
+spec:
+    replicas: 2
+    template:
+    metadata:
+        labels:
+        app: doks-example
+    spec:
+        containers:
+        - name: nginx
+        image: snormore/doks-example
+        ports:
+        - containerPort: 80
+            protocol: TCP
+        </pre>
+        <ul>
+            <li>A deployment Kubernetes controller was defined which created a ReplicaSet responsible for managing 2 instances of Pod workloads running the Docker image given in the manifest.</li>
+            <li>A service Kubernetes object was defined using type `LoadBalancer`, which causes a DigitalOcean load-balancer to be provisioned in your account with a public IP attached to the Kubernetes service.</li>
+        </ul>
+    </body>
+</html>
