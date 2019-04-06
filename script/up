@@ -2,7 +2,8 @@
 set -euo pipefail
 CLUSTER="example"
 SERVICE="doks-example"
+CONTEXT="do-nyc1-${CLUSTER}"
 doctl k8s cluster create ${CLUSTER}
-kubectl apply -f manifest.yaml
-script/wait-for-service ${SERVICE}
-open http://$(kubectl get service doks-example --template="{{range .status.loadBalancer.ingress}}{{.ip}}{{end}}")
+kubectl --context ${CONTEXT} apply -f manifest.yaml
+script/wait-for-service ${CONTEXT} ${SERVICE}
+open http://$(kubectl --context ${CONTEXT} get service ${SERVICE} --template="{{range .status.loadBalancer.ingress}}{{.ip}}{{end}}")
