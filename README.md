@@ -14,4 +14,4 @@ Run `script/down` or `doctl k8s cluster delete example`
 
 ## Note
 
-- This example creates a DigitalOcean Load Balancer, which is a billable service. Load balancers cost $10/month, billed hourly at $0.015. Leaving this cluster running will result in charges. More on [load balancers here](https://www.digitalocean.com/docs/networking/load-balancers/overview/).
+- This example creates a DigitalOcean Load Balancer, which is a billable service. Load balancers cost $10/month, billed hourly at $0.015. Leaving this workload running will result in charges. More on [load balancers here](https://www.digitalocean.com/docs/networking/load-balancers/overview/).
