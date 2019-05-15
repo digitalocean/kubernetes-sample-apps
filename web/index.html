@@ -1,50 +1,131 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>DOKS Getting Started</title>
-        <link href="style.css" type="text/css" rel="stylesheet" />
+        <link rel="stylesheet" href="https://assets.digitalocean.com/bui/1.2.2/bui.css">
+        <link href="./style.css" type="text/css" rel="stylesheet">
+
+        <meta name="viewport" content="width=device-width, maximum-scale=1.0">
+
+        <title>Welcome to DOKS</title>
     </head>
     <body>
-        <img src="do.png" />
-        <h1>Congratulations, you deployed your first workload!</h1>
-        <pre>
+        <div class="Header bui-Inline">
+            <svg class="Icon bui-Icon--xlarge"><use xlink:href="#logo"></use></svg>
+        </div>
+
+        <main>
+            <div class="bui-GridContainer bui-u-flexMiddle">
+                <div class="bui-Col-6">
+                    <div id="welcome">
+                        <h1 class="bui-u-textBold">Welcome to DOKS</h1>
+                        <p>Congratulations, you deployed your first workload! You have just created a <span class="bui-u-textCode">Deployment</span> responsible for managing 2 instances of Pod workloads running the docker image given in the manifest. In addition to this <span class="bui-u-textCode">Deployment</span>, you have also configured a <span class="bui-u-textCode">Service</span> of type <span class="bui-u-textCode">LoadBalancer</span> that exposes the <span class="bui-u-textCode">Deployment</span> publicly using a DigitalOcean Load Balancer, which is a paid service.</p>
+                    </div>
+                </div>
+
+                <div class="bui-Col-6">
+                    <div id="running">
+                        <h2>Here's what's running:</h2>
+                        <pre><code id="manifest" class="bui-CodeBlock">
+---
 kind: Service
 apiVersion: v1
 metadata:
-    name: doks-example
-    annotations:
-    service.beta.kubernetes.io/do-loadbalancer-protocol: "http"
+  name: doks-example
 spec:
-    type: LoadBalancer
-    selector:
+  type: LoadBalancer
+  selector:
     app: doks-example
-    ports:
+  ports:
     - name: http
-        protocol: TCP
-        port: 80
-        targetPort: 80
+      protocol: TCP
+      port: 80
+      targetPort: 80
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-    name: doks-example
+  name: doks-example
 spec:
-    replicas: 2
-    template:
+  replicas: 2
+  template:
     metadata:
-        labels:
+      labels:
         app: doks-example
     spec:
-        containers:
-        - name: nginx
+      containers:
+      - name: nginx
         image: digitalocean/doks-example
         ports:
         - containerPort: 80
-            protocol: TCP
-        </pre>
-        <ul>
-            <li>A deployment Kubernetes controller was defined which created a ReplicaSet responsible for managing 2 instances of Pod workloads running the Docker image given in the manifest.</li>
-            <li>A service Kubernetes object was defined using type `LoadBalancer`, which causes a DigitalOcean load-balancer to be provisioned in your account with a public IP attached to the Kubernetes service.</li>
-        </ul>
+          protocol: TCP
+                        </code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bui-Col">
+                <div id="more">
+                    <h3>Learn more about DigitalOcean Kubernetes Service</h3>
+                    <ul class="bui-BlockGrid bui-BlockGrid-4 bui-u-flexDeepMatch">
+                        <li>
+                            <div class="more-item">
+                                <span class="more-type">White Paper</span>
+                                <h3 class="bui-u-textPrimary bui-u-textRegular">Running Cloud Native Applications</h3>
+                                <p>Running Cloud Native Application on DigitalOcean Kubernetes Service.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="more-item">
+                                <span class="more-type">Product Docs</span>
+                                <h3 class="bui-u-textPrimary bui-u-textRegular">Quick Start</h3>
+                                <p>From zero to working in a few minutes.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="more-item">
+                                <span class="more-type">Tutorial</span>
+                                <h3 class="bui-u-textPrimary bui-u-textRegular">Architecting Applications for Kubernetes</h3>
+                                <p>Design your application for Kubernetes.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="more-item">
+                                <span class="more-type">Education</span>
+                                <h3 class="bui-u-textPrimary bui-u-textRegular">Resource Center</h3>
+                                <p>Learn more about building and deploying microservices with a robust library of Kubernetes assets.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </main>
+
+        <div id="footer" class="bui-Footer">
+            <a href="https://blog.digitalocean.com/">Blog</a>
+            <a href="https://www.digitalocean.com/pricing">Pricing</a>
+            <a href="https://www.digitalocean.com/company/careers">Careers</a>
+            <a href="https://www.digitalocean.com/legal/terms">Terms</a>
+            <a href="https://www.digitalocean.com/legal/privacy">Privacy</a>
+            <a href="https://status.digitalocean.com">Status</a>
+            <a href="https://developers.digitalocean.com">API Docs</a>
+            <a href="https://www.digitalocean.com/community">Tutorials</a>
+            <a href="https://cloudsupport.digitalocean.com/">Support</a>
+        </div>
+
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+        <script src="https://assets.digitalocean.com/bui/1.2.2/bui.js"></script>
+
+        <script>
+            var xhr = new XMLHttpRequest;
+            xhr.open('get','https://assets.digitalocean.com/bui/1.2.2/bui-icons.svg',true);
+            xhr.onreadystatechange = function(){
+              if (xhr.readyState != 4) return;
+              var svg = xhr.responseXML.documentElement;
+              svg = document.importNode(svg,true); // surprisingly optional in these browsers
+              document.head.appendChild(svg);
+            };
+            xhr.send();
+        </script>
+
     </body>
 </html>
