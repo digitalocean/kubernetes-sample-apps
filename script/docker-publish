@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
-TARGET="snormore/doks-example"
+TARGET="digitalocean/doks-example"
 docker build -t ${TARGET} .
 docker push ${TARGET}

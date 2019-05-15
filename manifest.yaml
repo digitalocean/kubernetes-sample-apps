@@ -27,7 +27,7 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: snormore/doks-example
+        image: digitalocean/doks-example
         ports:
         - containerPort: 80
           protocol: TCP
