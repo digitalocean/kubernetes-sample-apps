@@ -34,12 +34,12 @@ metadata:
 spec:
   type: LoadBalancer
   selector:
-  app: doks-example
+    app: doks-example
   ports:
-  - name: http
-    protocol: TCP
-    port: 80
-    targetPort: 80
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -52,8 +52,8 @@ spec:
       labels:
         app: doks-example
     spec:
-        containers:
-        - name: nginx
+      containers:
+      - name: nginx
         image: digitalocean/doks-example
         ports:
         - containerPort: 80

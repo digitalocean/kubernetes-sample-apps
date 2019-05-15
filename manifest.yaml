@@ -1,9 +1,8 @@
+---
 kind: Service
 apiVersion: v1
 metadata:
   name: doks-example
-  annotations:
-    service.beta.kubernetes.io/do-loadbalancer-protocol: "http"
 spec:
   type: LoadBalancer
   selector:
