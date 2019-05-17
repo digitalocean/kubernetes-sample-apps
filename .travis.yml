@@ -1,0 +1,9 @@
+services:
+  - 'docker'
+
+script:
+  - docker build -t doks-example .
+  - docker run --rm -it doks-example sleep 1
+
+notifications:
+  email: false
