@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/digitalocean/doks-example.svg?branch=master)](https://travis-ci.org/digitalocean/doks-example)
+
 # Getting Started
 
  1. Create your Kubernetes cluster: `doctl k8s cluster create example`
