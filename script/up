@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
-CLUSTER="example"
+CLUSTER="kb-example"
 SERVICE="doks-example"
-CONTEXT="do-nyc1-${CLUSTER}"
-doctl k8s cluster create ${CLUSTER}
+REGION="lon1"
+CONTEXT="do-${REGION}-${CLUSTER}"
+doctl k8s cluster create ${CLUSTER} --region ${REGION}
 kubectl --context ${CONTEXT} apply -f manifest.yaml
 script/wait-for-service ${CONTEXT} ${SERVICE}
 open http://$(kubectl --context ${CONTEXT} get service ${SERVICE} --template="{{range .status.loadBalancer.ingress}}{{.ip}}{{end}}")
