@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-CLUSTER="example"
-doctl k8s cluster delete ${CLUSTER}
+CLUSTER="kb-example"
+# doctl k8s cluster delete ${CLUSTER}
+LBID=`doctl compute load-balancer list | grep -wo '^[0123456789abcdef\-]*'`
+doctl compute load-balancer delete ${LBID}
