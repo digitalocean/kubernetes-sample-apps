@@ -13,16 +13,19 @@ spec:
       port: 80
       targetPort: 80
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: doks-example
 spec:
   replicas: 2
+  selector:
+    matchLabels:
+      service: doks-example
   template:
     metadata:
       labels:
-        app: doks-example
+        service: doks-example
     spec:
       containers:
       - name: nginx
