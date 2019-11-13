@@ -21,11 +21,11 @@ spec:
   replicas: 2
   selector:
     matchLabels:
-      service: doks-example
+      app: doks-example
   template:
     metadata:
       labels:
-        service: doks-example
+        app: doks-example
     spec:
       containers:
       - name: nginx
