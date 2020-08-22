@@ -12,8 +12,6 @@ Or you can just run `script/up` to do all of this.
 
 ## Cleaning up
 
-Run `script/down` or `doctl k8s cluster delete example`
+Run `script/down` to tear down the cluster and remove the load-balancer.
 
-## Note
-
-- This example creates a DigitalOcean Load Balancer, which is a billable service. Load balancers cost $10/month, billed hourly at $0.015. Leaving this workload running will result in charges. More on [load balancers here](https://www.digitalocean.com/docs/networking/load-balancers/overview/).
+**Note:** If you delete the cluster directly, the load-balancer will stick around and result in charges.
