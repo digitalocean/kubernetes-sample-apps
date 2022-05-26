@@ -11,7 +11,7 @@ Main project is [npm](https://www.npmjs.com) based, hence you can build the appl
 ```shell
 npm install --include=dev
 
-npm build
+npm run build
 ```
 
 You can test the application locally, by running below command:
@@ -60,13 +60,13 @@ The sample manifest provided in this repository will get you started with [Knati
 
 First, you need a [DOKS](https://docs.digitalocean.com/products/kubernetes/quickstart) cluster configured and running. Then, the [Knative 1-Click App](https://marketplace.digitalocean.com/apps/knative) must be provisioned to your DOKS cluster.
 
-Next, edit the [knative-service](resources/knative-service.yaml) manifest provided in this repository, and replace the `<>` placeholders accordingly. Finally, apply changes using `kubectl`:
+Next, edit the [knative-service](resources/knative-service.yaml) manifest provided in this repository, and replace the `<>` placeholders accordingly. Finally, apply changes using `kubectl` (make sure to change directory to `knative-example` first):
 
 ```shell
-kubectl apply -f knative-example/resoures/knative-service.yaml
+kubectl apply -f resources/knative-service.yaml
 ```
 
-You can check Knative service status via [kn] CLI:
+You can check Knative service status via [kn](https://knative.dev/docs/install/client/install-kn) CLI:
 
 ```shell
 kn services list
