@@ -5,3 +5,4 @@ This repository contains a collection of sample applications that can be used in
 Sample apps provided by this repository:
 
 - [doks-example](doks-example/) - Deploy your first application (workload) to a fresh DOKS cluster.
+- [knative-example](knative-example/) - Create your first javascript application using Docker and Knative.

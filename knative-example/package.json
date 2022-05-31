@@ -1,0 +1,25 @@
+{
+  "name": "knative-example",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "webpack server --config webpack.config.js --mode development",
+    "build": "webpack",
+    "build-dev": "webpack --mode development",
+    "build-prod": "webpack --mode production"
+  },
+  "dependencies": {
+    "game-2048": "^0.0.7"
+  },
+  "devDependencies": {
+    "css-loader": "^6.7.1",
+    "html-webpack-plugin": "^5.5.0",
+    "style-loader": "^3.3.1",
+    "webpack": "^5.72.1",
+    "webpack-cli": "^4.9.2",
+    "webpack-dev-server": "^4.9.0"
+  },
+  "author": "",
+  "license": "MIT",
+  "description": "Sample 2048 Game App"
+}
