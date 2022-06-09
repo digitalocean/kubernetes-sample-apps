@@ -1,0 +1,16 @@
+## 2048 Game Sample Application Kustomization
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Making sure all resources used in this tutorial are created in a dedicated namespace
+# Also specific annotations are added for later identification
+namespace: game-2048
+commonAnnotations:
+  provider: kubernetes-sample-apps
+
+# 2048 game resources (namespace, services, deployments, etc)
+resources:
+  - resources/namespace.yaml
+  - resources/deployment.yaml
+  - resources/service.yaml
