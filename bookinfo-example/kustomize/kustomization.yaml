@@ -1,0 +1,18 @@
+## Bookinfo Sample Application Kustomization
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Making sure all resources used in this tutorial are created in a dedicated namespace
+# Also specific annotations are added for later identification
+namespace: bookinfo
+commonAnnotations:
+  provider: kubernetes-sample-apps
+
+# Bookinfo resources (namespace, services, deployments, etc)
+resources:
+  - resources/namespace.yaml
+  - https://raw.githubusercontent.com/istio/istio/release-1.14/samples/bookinfo/platform/kube/bookinfo.yaml
+  # If you want to apply Istio configuration on top of the bookinfo deployment, uncomment below lines (assuming you have Istio already installed)
+  # - https://raw.githubusercontent.com/istio/istio/release-1.14/samples/bookinfo/networking/bookinfo-gateway.yaml
+  # - https://raw.githubusercontent.com/istio/istio/release-1.14/samples/bookinfo/networking/destination-rule-all.yaml
