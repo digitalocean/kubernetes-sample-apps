@@ -12,3 +12,15 @@ commonAnnotations:
 # Emojivoto resources (namespace, services, deployments, etc)
 resources:
   - github.com/BuoyantIO/emojivoto/kustomize/deployment
+
+patches:
+  - path: patches/emoji-svc.yaml
+    target:
+      version: v1
+      kind: Service
+      name: emoji-svc
+  - path: patches/voting-svc.yaml
+    target:
+      version: v1
+      kind: Service
+      name: voting-svc

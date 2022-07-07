@@ -1,0 +1,4 @@
+- op: add
+  path: /metadata/labels
+  value: 
+    app: voting-svc
