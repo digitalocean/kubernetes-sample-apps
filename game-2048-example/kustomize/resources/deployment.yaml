@@ -21,7 +21,7 @@ spec:
           image: registry.digitalocean.com/<YOUR_DOCKER_REGISTRY_NAME_HERE>/2048-game:latest
           ports:
             - name: http
-              containerPort: 80
+              containerPort: 8080
           resources:
             requests:
               cpu: 100m
@@ -29,3 +29,7 @@ spec:
             limits:
               cpu: 200m
               memory: 100Mi
+          # securityContext:
+          #   readOnlyRootFilesystem: true
+          #   runAsNonRoot: true
+          #   allowPrivilegeEscalation: false
