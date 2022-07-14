@@ -61,7 +61,7 @@ The sample [Dockerfile](./Dockerfile) provided in this repository is using the [
 Then, you can issue bellow command to launch the `2048-game` container (make sure to replace the `<>` placeholders accordingly):
 
 ```shell
-docker run --rm -it -p 8080:80 registry.digitalocean.com/<YOUR_DOCKER_REGISTRY_NAME_HERE>/2048-game
+docker run --rm -it -p 8080:8080 registry.digitalocean.com/<YOUR_DOCKER_REGISTRY_NAME_HERE>/2048-game
 ```
 
 Now, visit [localhost:8080](http://localhost:8080) to check the 2048 game app in your web browser. Finally, you can push the image to your DigitalOcean docker registry (make sure to replace the `<>` placeholders accordingly):
@@ -122,8 +122,8 @@ The output looks similar to:
 NAME                            READY   STATUS    RESTARTS   AGE
 pod/game-2048-f96755947-dgj7z   1/1     Running   0          5m19s
 
-NAME                TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)   AGE
-service/game-2048   ClusterIP   10.245.120.202   <none>        80/TCP    5m21s
+NAME                TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)     AGE
+service/game-2048   ClusterIP   10.245.120.202   <none>        8080/TCP    5m21s
 
 NAME                        READY   UP-TO-DATE   AVAILABLE   AGE
 deployment.apps/game-2048   1/1     1            1           5m22s
@@ -135,7 +135,7 @@ replicaset.apps/game-2048-f96755947   1         1         1       5m22s
 Finally, port-forward the `game-2048` service using `kubectl`:
 
 ```shell
-kubectl port-forward service/game-2048 -n game-2048 8080:80
+kubectl port-forward service/game-2048 -n game-2048 8080:8080
 ```
 
 Open a web browser and point to [localhost:8080](http://localhost:8080/). You should see the `game-2048` welcome page:
