@@ -1,4 +1,4 @@
-name: Game 2048 Kubescape CI/CD Example
+name: Game 2048 Snyk CI/CD Example
 
 on:
   # push:
@@ -9,15 +9,16 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
     inputs:
-      kubescape_fail_threshold:
-        description: "Sets fail threshold for Kubescape"
+      snyk_fail_threshold:
+        description: |
+          Sets fail threshold for Snyk (low | medium | high)
         required: true
-        default: "30"
+        default: "medium"
 
 env:
   PROJECT_DIR: "game-2048-example"
   IMAGE_NAME: "game-2048"
-  KUBESCAPE_FAIL_THRESHOLD: 30
+  SNYK_FAIL_THRESHOLD: "medium"
 
 jobs:
   build-and-test-application:
@@ -34,7 +35,7 @@ jobs:
           npm test
         working-directory: ${{ env.PROJECT_DIR }}
 
-  kubescape-nsa-security-check:
+  snyk-iac-security-check:
     runs-on: ubuntu-latest
     needs: build-and-test-application
 
@@ -42,20 +43,28 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Install Kubescape
-        run: curl -s https://raw.githubusercontent.com/armosec/kubescape/master/install.sh | /bin/bash
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v3
 
-      - name: Scan YAML files
-        id: kubescape
+      - name: Render kustomize template
+        run: kubectl kustomize kustomize/ > kustomize.yaml
+        working-directory: ${{ env.PROJECT_DIR }}
+
+      - name: Install Snyk
+        uses: snyk/actions/setup@master
+
+      - name: Check for Kubernetes manifests vulnerabilities
         run: |
-          # Check if the kubescape threshold parameter value comes from a manual workflow run
-          if [[ "${{ github.event.inputs.kubescape_fail_threshold }}null" != "null" ]]; then
-            KUBESCAPE_FAIL_THRESHOLD="${{ github.event.inputs.kubescape_fail_threshold }}"
+          # Check if the snyk threshold parameter value comes from a manual workflow run
+          if [[ "${{ github.event.inputs.snyk_fail_threshold }}null" != "null" ]]; then
+            SNYK_FAIL_THRESHOLD="${{ github.event.inputs.snyk_fail_threshold }}"
           fi
-          kubescape scan framework nsa *.yaml -t $KUBESCAPE_FAIL_THRESHOLD --submit --account=${{ secrets.ARMOSEC_PORTAL_ACCOUNT_ID }}
-        working-directory: ${{ env.PROJECT_DIR }}/kustomize/resources/
+          snyk iac test kustomize.yaml --severity-threshold="$SNYK_FAIL_THRESHOLD" --report
+        working-directory: ${{ env.PROJECT_DIR }}
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
-      - name: Notify using Slack about Kubescape Scan Issues
+      - name: Notify using Slack about Snyk Scan Issues
         if: ${{ always() }}
         uses: 8398a7/action-slack@v3
         with:
@@ -74,7 +83,7 @@ jobs:
                   *Ref:* ${process.env.AS_REF}\n
                   *Author:* ${process.env.AS_AUTHOR}\n
                   *Status:* ${{ job.status }} in ${process.env.AS_TOOK}\n
-                  *Kubescape scan results:* https://cloud.armosec.io/repositories-scan/
+                  *Snyk scan results:* https://app.snyk.io
                 `,
               }]
             }
@@ -83,7 +92,7 @@ jobs:
 
   build-and-push-app-image:
     runs-on: ubuntu-latest
-    needs: kubescape-nsa-security-check
+    needs: snyk-iac-security-check
 
     steps:
       - name: Checkout
