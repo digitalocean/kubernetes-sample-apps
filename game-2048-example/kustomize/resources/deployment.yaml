@@ -33,3 +33,6 @@ spec:
           #   readOnlyRootFilesystem: true
           #   runAsNonRoot: true
           #   allowPrivilegeEscalation: false
+          #   capabilities:
+          #     drop:
+          #       - all
