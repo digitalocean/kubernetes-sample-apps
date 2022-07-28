@@ -15,8 +15,9 @@ on:
         default: "30"
 
 env:
+  ENVIRONMENT: "dev"
   PROJECT_DIR: "game-2048-example"
-  IMAGE_NAME: "game-2048"
+  PROJECT_NAME: "game-2048"
   KUBESCAPE_FAIL_THRESHOLD: 30
 
 jobs:
@@ -45,15 +46,12 @@ jobs:
       - name: Install Kubescape
         run: curl -s https://raw.githubusercontent.com/armosec/kubescape/master/install.sh | /bin/bash
 
-      - name: Scan YAML files
-        id: kubescape
+      - name: Scan Kubernetes YAML files
         run: |
-          # Check if the kubescape threshold parameter value comes from a manual workflow run
-          if [[ "${{ github.event.inputs.kubescape_fail_threshold }}null" != "null" ]]; then
-            KUBESCAPE_FAIL_THRESHOLD="${{ github.event.inputs.kubescape_fail_threshold }}"
-          fi
-          kubescape scan framework nsa *.yaml -t $KUBESCAPE_FAIL_THRESHOLD --submit --account=${{ secrets.ARMOSEC_PORTAL_ACCOUNT_ID }}
-        working-directory: ${{ env.PROJECT_DIR }}/kustomize/resources/
+          kubescape scan framework nsa kustomize/ \
+            -t ${{ github.event.inputs.kubescape_fail_threshold || env.KUBESCAPE_FAIL_THRESHOLD }} \
+            --submit --account=${{ secrets.ARMOSEC_PORTAL_ACCOUNT_ID }}
+        working-directory: ${{ env.PROJECT_DIR }}
 
       - name: Notify using Slack about Kubescape Scan Issues
         if: ${{ always() }}
@@ -68,6 +66,7 @@ jobs:
                 color: '${{ job.status }}' === 'success' ? 'good' : '${{ job.status }}' === 'failure' ? 'danger' : 'warning',
                 text:`
                   ${process.env.AS_WORKFLOW}\n
+                  *Environment*: ${process.env.ENVIRONMENT}\n
                   *Job:* ${process.env.AS_JOB}\n
                   *Commit:* (${process.env.AS_COMMIT})\n
                   *Repo:* ${process.env.AS_REPO}\n
@@ -102,7 +101,7 @@ jobs:
         with:
           context: ${{ env.PROJECT_DIR }}
           push: true
-          tags: "${{ secrets.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
+          tags: "${{ secrets.DOCKER_REGISTRY }}/${{ env.PROJECT_NAME }}:${{ github.sha }}"
 
   deploy-to-k8s:
     runs-on: ubuntu-latest
@@ -126,8 +125,7 @@ jobs:
 
       - name: Configure app deployment registry
         run: |
-          IMAGE_TAG="${{ github.sha }}"
-          DOCKER_IMAGE="${{ secrets.DOCKER_REGISTRY }}/${IMAGE_NAME}:${IMAGE_TAG}"
+          DOCKER_IMAGE="${{ secrets.DOCKER_REGISTRY }}/${{ env.PROJECT_NAME }}:${{ github.sha }}"
           sed -i "s#image:.*#image: ${DOCKER_IMAGE}#g" deployment.yaml
         working-directory: ${{ env.PROJECT_DIR }}/kustomize/resources/
 
