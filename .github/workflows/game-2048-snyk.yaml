@@ -58,20 +58,19 @@ jobs:
       - name: Check application container vulnerabilities
         run: |
           snyk container test "${{ secrets.DOCKER_REGISTRY }}/${{ env.PROJECT_NAME }}:${{ github.sha }}" \
-            --file=Dockerfile \
+            --file=${{ env.PROJECT_DIR }}/Dockerfile \
             --severity-threshold=${{ github.event.inputs.snyk_fail_threshold || env.SNYK_FAIL_THRESHOLD }} \
             --target-name=${{ env.PROJECT_NAME }} \
             --target-reference=${{ env.ENVIRONMENT }} \
-            --sarif --sarif-file-output=snyk-container-scan.sarif
+            --sarif-file-output=snyk-container-scan.sarif
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        working-directory: ${{ env.PROJECT_DIR }}
 
       - name: Upload Snyk report SARIF file
         if: ${{ always() }}
         uses: github/codeql-action/upload-sarif@v2
         with:
-          sarif_file: ${{ env.PROJECT_DIR }}/snyk-container-scan.sarif
+          sarif_file: snyk-container-scan.sarif
           category: snyk-container-scan
           
       - name: Notify using Slack about Snyk Scan Issues
@@ -141,7 +140,7 @@ jobs:
             --severity-threshold=${{ github.event.inputs.snyk_fail_threshold || env.SNYK_FAIL_THRESHOLD }} \
             --target-name=${{ env.PROJECT_NAME }} \
             --target-reference=${{ env.ENVIRONMENT }} \
-            --sarif --sarif-file-output=snyk-iac-scan.sarif \
+            --sarif-file-output=snyk-iac-scan.sarif \
             --report
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
