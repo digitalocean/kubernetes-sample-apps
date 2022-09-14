@@ -41,7 +41,7 @@ spec:
               - all
           privileged: false
           readOnlyRootFilesystem: true
-        image: gcr.io/google-samples/microservices-demo/paymentservice:v0.3.8
+        image: registry.digitalocean.com/microservices-demo/paymentservice:1.0.0
         ports:
         - containerPort: 50051
         env:

@@ -5,7 +5,7 @@ metadata:
   name: letsencrypt-nginx
 spec:
   acme:
-    email: <YOUR_EMAIL_ADDRESS>
+    email: bogdan.pastiu@gmail.com
     server: https://acme-v02.api.letsencrypt.org/directory
     privateKeySecretRef:
       name: letsencrypt-nginx-private-key

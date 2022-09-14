@@ -7,10 +7,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - <YOUR_DOMAIN_NAME>
+    - app.bond-0.co
     secretName: letsencrypt-nginx
   rules:
-    - host: <YOUR_DOMAIN_NAME>
+    - host: app.bond-0.co
       http:
         paths:
           - path: /

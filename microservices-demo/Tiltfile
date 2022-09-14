@@ -1,0 +1,29 @@
+#platform = str(local("kubectl get node -ojsonpath='{.items[0].status.nodeInfo.operatingSystem}/{.items[0].status.nodeInfo.architecture}'"))
+#os.putenv('DOCKER_DEFAULT_PLATFORM', 'a')
+
+k8s_yaml(
+  ['kubernetes-manifests/adservice.yaml',
+   'kubernetes-manifests/cartservice.yaml',
+   'kubernetes-manifests/checkoutservice.yaml',
+   'kubernetes-manifests/currencyservice.yaml',
+   'kubernetes-manifests/emailservice.yaml',
+   'kubernetes-manifests/frontend.yaml',
+   'kubernetes-manifests/loadgenerator.yaml',
+   'kubernetes-manifests/paymentservice.yaml',
+   'kubernetes-manifests/productcatalogservice.yaml',
+   #'kubernetes-manifests/recommendationservice.yaml',
+   'kubernetes-manifests/shippingservice.yaml'])
+
+docker_build('adservice', 'src/adservice')
+docker_build('cartservice', 'src/cartservice/src')
+docker_build('checkoutservice', 'src/checkoutservice')
+docker_build('currencyservice', 'src/currencyservice')
+docker_build('emailservice', 'src/emailservice')
+docker_build('frontend', 'src/frontend')
+docker_build('loadgenerator', 'src/loadgenerator')
+docker_build('paymentservice', 'src/paymentservice')
+docker_build('productcatalogservice', 'src/productcatalogservice')
+#docker_build('recommendationservice', 'src/recommendationservice')
+docker_build('shippingservice', 'src/shippingservice')
+
+k8s_resource('frontend', port_forwards='9000')
