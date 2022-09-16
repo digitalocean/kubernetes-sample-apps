@@ -1,0 +1,25 @@
+os.putenv('DOCKER_DEFAULT_PLATFORM', 'linux/amd64')
+
+k8s_yaml(
+  ['kubernetes-manifests/cartservice.yaml',
+   'kubernetes-manifests/checkoutservice.yaml',
+   'kubernetes-manifests/currencyservice.yaml',
+   'kubernetes-manifests/emailservice.yaml',
+   'kubernetes-manifests/frontend.yaml',
+   'kubernetes-manifests/paymentservice.yaml',
+   'kubernetes-manifests/productcatalogservice.yaml',
+   'kubernetes-manifests/recommendationservice.yaml',
+   'kubernetes-manifests/redis.yaml',
+   'kubernetes-manifests/shippingservice.yaml'])
+
+docker_build('cartservice', 'src/cartservice/src')
+docker_build('checkoutservice', 'src/checkoutservice')
+docker_build('currencyservice', 'src/currencyservice')
+docker_build('emailservice', 'src/emailservice')
+docker_build('frontend', 'src/frontend')
+docker_build('paymentservice', 'src/paymentservice')
+docker_build('productcatalogservice', 'src/productcatalogservice')
+docker_build('recommendationservice', 'src/recommendationservice')
+docker_build('shippingservice', 'src/shippingservice')
+
+k8s_resource('frontend', port_forwards='9000')

@@ -37,7 +37,7 @@ while IFS= read -d $'\0' -r dir; do
     (
         cd "${builddir}"
         log "Building: ${image}"
-        docker build -t "${image}" .
+        docker buildx build --platform=linux/amd64 -t "${image}" .
 
         log "Pushing: ${image}"
         docker push "${image}"

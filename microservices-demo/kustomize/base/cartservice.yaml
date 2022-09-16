@@ -41,7 +41,8 @@ spec:
               - all
           privileged: false
           readOnlyRootFilesystem: true
-        image: gcr.io/google-samples/microservices-demo/cartservice:v0.3.9
+        imagePullPolicy: Always
+        image: registry.digitalocean.com/microservices-demo/cartservice:1.0.0
         ports:
         - containerPort: 7070
         env:
@@ -55,14 +56,16 @@ spec:
             cpu: 300m
             memory: 128Mi
         readinessProbe:
-          initialDelaySeconds: 15
+          timeoutSeconds: 15
+          initialDelaySeconds: 20
           exec:
-            command: ["/bin/grpc_health_probe", "-addr=:7070", "-rpc-timeout=5s"]
+            command: ["/bin/grpc_health_probe", "-addr=:7070", "-rpc-timeout=5s", "-connect-timeout=10s"]
         livenessProbe:
-          initialDelaySeconds: 15
-          periodSeconds: 10
+          timeoutSeconds: 15
+          initialDelaySeconds: 20
+          periodSeconds: 15
           exec:
-            command: ["/bin/grpc_health_probe", "-addr=:7070", "-rpc-timeout=5s"]
+            command: ["/bin/grpc_health_probe", "-addr=:7070", "-rpc-timeout=5s", "-connect-timeout=10s" ]
 ---
 apiVersion: v1
 kind: Service

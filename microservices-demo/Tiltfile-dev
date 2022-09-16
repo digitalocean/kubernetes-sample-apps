@@ -1,0 +1,2 @@
+allow_k8s_contexts('do-nyc1-starterkit-cluster-2')
+k8s_yaml(kustomize('kustomize'))
