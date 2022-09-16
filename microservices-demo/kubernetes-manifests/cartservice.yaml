@@ -49,20 +49,22 @@ spec:
           value: "redis-cart:6379"
         resources:
           requests:
-            cpu: 200m
-            memory: 64Mi
-          limits:
             cpu: 300m
             memory: 128Mi
+          limits:
+            cpu: 400m
+            memory: 256Mi
         readinessProbe:
-          initialDelaySeconds: 15
+          timeoutSeconds: 15
+          initialDelaySeconds: 20
           exec:
-            command: ["/bin/grpc_health_probe", "-addr=:7070", "-rpc-timeout=5s"]
+            command: ["/bin/grpc_health_probe", "-addr=:7070", "-rpc-timeout=5s", "-connect-timeout=10s"]
         livenessProbe:
-          initialDelaySeconds: 15
-          periodSeconds: 10
+          timeoutSeconds: 15
+          initialDelaySeconds: 20
+          periodSeconds: 15
           exec:
-            command: ["/bin/grpc_health_probe", "-addr=:7070", "-rpc-timeout=5s"]
+            command: ["/bin/grpc_health_probe", "-addr=:7070", "-rpc-timeout=5s", "-connect-timeout=10s" ]
 ---
 apiVersion: v1
 kind: Service

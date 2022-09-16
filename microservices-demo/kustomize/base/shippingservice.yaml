@@ -40,7 +40,8 @@ spec:
               - all
           privileged: false
           readOnlyRootFilesystem: true
-        image: gcr.io/google-samples/microservices-demo/shippingservice:v0.3.8
+        imagePullPolicy: Always
+        image: registry.digitalocean.com/microservices-demo/shippingservice:1.0.0
         ports:
         - containerPort: 50051
         env:
@@ -55,10 +56,14 @@ spec:
         # - name: JAEGER_SERVICE_ADDR
         #   value: "jaeger-collector:14268"
         readinessProbe:
-          periodSeconds: 5
+          timeoutSeconds: 15
+          periodSeconds: 15
+          initialDelaySeconds: 15
           exec:
             command: ["/bin/grpc_health_probe", "-addr=:50051"]
         livenessProbe:
+          timeoutSeconds: 15
+          initialDelaySeconds: 15
           exec:
             command: ["/bin/grpc_health_probe", "-addr=:50051"]
         resources:

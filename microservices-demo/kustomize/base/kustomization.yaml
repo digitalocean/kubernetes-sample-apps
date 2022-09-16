@@ -17,13 +17,11 @@ kind: Kustomization
 
 resources:
   - namespace.yaml
-  - adservice.yaml
   - cartservice.yaml
   - checkoutservice.yaml
   - currencyservice.yaml
   - emailservice.yaml
   - frontend.yaml
-  - loadgenerator.yaml
   - paymentservice.yaml
   - productcatalogservice.yaml
   - recommendationservice.yaml
