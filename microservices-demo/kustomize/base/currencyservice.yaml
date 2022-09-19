@@ -42,7 +42,7 @@ spec:
           privileged: false
           readOnlyRootFilesystem: true
         imagePullPolicy: Always
-        image: registry.digitalocean.com/microservices-demo/currencyservice:1.0.0
+        image: <YOUR_DOCR_IMAGE>
         ports:
         - name: grpc
           containerPort: 7000
