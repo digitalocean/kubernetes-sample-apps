@@ -18,17 +18,18 @@ spec:
       containers:
         - name: backend
           # Replace the `<>` placeholders with your docker registry info
+          # For local development with Tilt the image will be set to: 2048-game
           image: registry.digitalocean.com/<YOUR_DOCKER_REGISTRY_NAME_HERE>/2048-game:latest
           ports:
             - name: http
               containerPort: 8080
           resources:
             requests:
-              cpu: 100m
-              memory: 50Mi
-            limits:
               cpu: 200m
               memory: 100Mi
+            limits:
+              cpu: 300m
+              memory: 200Mi
           # securityContext:
           #   readOnlyRootFilesystem: true
           #   runAsNonRoot: true
