@@ -1,6 +1,6 @@
 # Notes
 
-This application is based on this [project](https://github.com/GoogleCloudPlatform/microservices-demo). It will be used as a demo for the K8s adoption journey. This clone of the project has been stripped down to focus only on the major parts as required by the adoption journey.
+This application is a clone of thi [GoogleCloudPlatform project](https://github.com/GoogleCloudPlatform/microservices-demo). It will be used as a demo for the K8s adoption journey. This clone of the project has been stripped down to focus only on the major parts as required by the adoption journey.
 
 ## Deployment
 
