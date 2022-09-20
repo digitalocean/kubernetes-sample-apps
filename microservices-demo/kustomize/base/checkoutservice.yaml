@@ -41,7 +41,7 @@ spec:
             privileged: false
             readOnlyRootFilesystem: true
           imagePullPolicy: Always
-          image: registry.digitalocean.com/microservices-demo/checkoutservice:1.0.0
+          image: registry.digitalocean.com/<YOUR_DOCR_REPO_NAME_HERE>/checkoutservice:<YOUR_TAG_HERE>
           ports:
           - containerPort: 5050
           readinessProbe:

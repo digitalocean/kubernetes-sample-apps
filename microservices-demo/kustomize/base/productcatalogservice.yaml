@@ -42,7 +42,7 @@ spec:
           privileged: false
           readOnlyRootFilesystem: true
         imagePullPolicy: Always
-        image: registry.digitalocean.com/microservices-demo/productcatalogservice:1.0.0
+        image: registry.digitalocean.com/<YOUR_DOCR_REPO_NAME_HERE>/productcatalogservice:<YOUR_TAG_HERE>
         ports:
         - containerPort: 3550
         env:

@@ -1,2 +1,2 @@
-allow_k8s_contexts('do-nyc1-starterkit-cluster-2')
+allow_k8s_contexts('<YOUR_KUBERNETES_CONTEXT_HERE>')
 k8s_yaml(kustomize('kustomize'))
