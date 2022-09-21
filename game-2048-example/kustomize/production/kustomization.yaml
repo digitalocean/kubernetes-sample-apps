@@ -11,6 +11,10 @@ commonAnnotations:
 
 # 2048 game resources (namespace, services, deployments, etc)
 resources:
-  - resources/namespace.yaml
-  - resources/deployment.yaml
-  - resources/service.yaml
+  - ../base
+
+patchesStrategicMerge:
+- deployment-prod.yaml
+- wildcard-certificate-production.yaml
+- wildcard-host-production.yaml
+- wildcard-issuer-production.yaml
