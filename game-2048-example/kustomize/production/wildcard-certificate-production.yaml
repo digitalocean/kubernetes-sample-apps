@@ -3,7 +3,7 @@ kind: Certificate
 metadata:
   name: game-2048
 spec:
-  secretName: <YOUR_PRODUCTION_DOMAIN_NAME>
+  secretName: <YOUR_PRODUCTION_SECRET_NAME>
   issuerRef:
     name: letsencrypt-nginx-wcard
     kind: Issuer

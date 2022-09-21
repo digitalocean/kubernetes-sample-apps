@@ -5,10 +5,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - "*.bond-0.co"
-    secretName: bond-0.co
+    - "*.<YOUR_DEVELOPMENT_DOMAIN_NAME>"
+    secretName: <YOUR_DEVELOPMENT_SECRET_NAME>
   rules:
-    - host: dev.bond-0.co
+    - host: <YOUR_DEVELOPMENT_DOMAIN_NAME>
       http:
         paths:
           - path: /

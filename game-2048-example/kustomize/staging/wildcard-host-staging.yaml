@@ -6,7 +6,7 @@ spec:
   tls:
   - hosts:
     - "*.<YOUR_STAGING_DOMAIN_NAME>"
-    secretName: <YOUR_STAGING_DOMAIN_NAME>
+    secretName: <YOUR_STAGING_SECRET_NAME>
   rules:
     - host: <YOUR_STAGING_DOMAIN_NAME>
       http:

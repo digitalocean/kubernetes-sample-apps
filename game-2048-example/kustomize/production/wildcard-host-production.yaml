@@ -6,7 +6,7 @@ spec:
   tls:
   - hosts:
     - "*.<YOUR_PRODUCTION_DOMAIN_NAME>"
-    secretName: <YOUR_PRODUCTION_DOMAIN_NAME>
+    secretName: <YOUR_PRODUCTION_SECRET_NAME>
   rules:
     - host: <YOUR_PRODUCTION_DOMAIN_NAME>
       http:

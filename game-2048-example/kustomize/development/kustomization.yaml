@@ -14,7 +14,7 @@ bases:
   - ../base
 
 patchesStrategicMerge:
-- wildcard-host-dev.yaml
 - deployment-dev.yaml
+- wildcard-host-dev.yaml
 - wildcard-issuer-dev.yaml
 - wildcard-certificate-dev.yaml

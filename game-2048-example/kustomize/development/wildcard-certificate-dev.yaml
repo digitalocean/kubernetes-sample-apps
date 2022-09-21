@@ -3,12 +3,12 @@ kind: Certificate
 metadata:
   name: game-2048
 spec:
-  secretName: bond-0.co
+  secretName: <YOUR_DEVELOPMENT_SECRET_NAME>
   issuerRef:
     name: letsencrypt-nginx-wcard
     kind: Issuer
     group: cert-manager.io
-  commonName: "*.bond-0.co"
+  commonName: "*.<YOUR_DEVELOPMENT_DOMAIN_NAME>"
   dnsNames:
-    - "bond-0.co"
-    - "*.bond-0.co"
+    - "<YOUR_DEVELOPMENT_DOMAIN_NAME>"
+    - "*.<YOUR_DEVELOPMENT_DOMAIN_NAME>"
