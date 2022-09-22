@@ -6,7 +6,7 @@ spec:
   tls:
     - hosts:
         - "*.<YOUR_APP_DOMAIN_HERE>"
-      secretName: letsencrypt-frontend-dev
+      secretName: letsencrypt-frontend
   rules:
     - host: <SUBDOMAIN>.<YOUR_APP_DOMAIN_HERE>
       http:

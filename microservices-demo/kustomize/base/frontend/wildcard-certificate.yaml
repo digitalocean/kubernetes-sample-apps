@@ -3,7 +3,7 @@ kind: Certificate
 metadata:
   name: <YOUR_APP_DOMAIN_HERE>
 spec:
-  secretName: letsencrypt-frontend-dev
+  secretName: letsencrypt-frontend
   issuerRef:
     name: letsencrypt-nginx-wcard
     kind: Issuer
