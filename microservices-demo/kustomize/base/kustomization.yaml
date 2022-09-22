@@ -15,6 +15,9 @@ resources:
   - email-service/service.yaml
   - frontend/deployment.yaml
   - frontend/service.yaml
+  - frontend/ingress.yaml
+  - frontend/wildcard-certificate.yaml
+  - frontend/wildcard-issuer.yaml
   - payment-service/deployment.yaml
   - payment-service/service.yaml
   - product-catalog-service/deployment.yaml
