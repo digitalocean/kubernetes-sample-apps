@@ -3,24 +3,16 @@ kind: Kustomization
 
 namespace: microservices-demo
 
-resources:
+bases:
+  - "../base"
+
+patchesStrategicMerge:
   - cart-service/deployment.yaml
-  - cart-service/service.yaml
   - checkout-service/deployment.yaml
-  - checkout-service/service.yaml
   - currency-service/deployment.yaml
-  - currency-service/service.yaml
   - email-service/deployment.yaml
-  - email-service/service.yaml
   - frontend/deployment.yaml
-  - frontend/service.yaml
   - payment-service/deployment.yaml
-  - payment-service/service.yaml
   - product-catalog-service/deployment.yaml
-  - product-catalog-service/service.yaml
   - recommendation-service/deployment.yaml
-  - recommendation-service/service.yaml
-  - redis/deployment.yaml
-  - redis/service.yaml
   - shipping-service/deployment.yaml
-  - shipping-service/service.yaml
