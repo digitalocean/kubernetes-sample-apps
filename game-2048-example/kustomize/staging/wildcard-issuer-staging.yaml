@@ -1,9 +1,0 @@
----
-apiVersion: cert-manager.io/v1
-kind: Issuer
-metadata:
-  name: letsencrypt-nginx-wcard
-spec:
-  acme:
-    email: <YOUR_STAGING_EMAIL>
-
