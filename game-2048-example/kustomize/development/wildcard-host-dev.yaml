@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-game-2048
+spec:
+  tls:
+  - hosts:
+    - "*.<YOUR_DEVELOPMENT_DOMAIN_NAME>"
+    secretName: <YOUR_DEVELOPMENT_SECRET_NAME>
+  rules:
+    - host: <YOUR_DEVELOPMENT_DOMAIN_NAME>
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: game-2048
+                port:
+                  number: 8080
+  ingressClassName: nginx

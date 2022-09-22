@@ -10,7 +10,11 @@ commonAnnotations:
   provider: kubernetes-sample-apps
 
 # 2048 game resources (namespace, services, deployments, etc)
-resources:
-  - resources/namespace.yaml
-  - resources/deployment.yaml
-  - resources/service.yaml
+bases:
+  - ../base
+
+patchesStrategicMerge:
+- deployment-dev.yaml
+- wildcard-host-dev.yaml
+- wildcard-issuer-dev.yaml
+- wildcard-certificate-dev.yaml
