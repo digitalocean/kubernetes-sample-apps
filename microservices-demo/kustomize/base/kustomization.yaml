@@ -4,6 +4,7 @@ kind: Kustomization
 namespace: microservices-demo
 
 resources:
+  - namespace.yaml
   - cart-service/deployment.yaml
   - cart-service/service.yaml
   - checkout-service/deployment.yaml

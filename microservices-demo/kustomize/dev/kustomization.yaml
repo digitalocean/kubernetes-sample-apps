@@ -6,6 +6,12 @@ namespace: microservices-demo
 bases:
   - "../base"
 
+resources:
+  - frontend/wildcard-host.yaml
+  - frontend/wildcard-issuer.yaml
+  - frontend/wildcard-certificate.yaml
+
+
 patchesStrategicMerge:
   - cart-service/deployment.yaml
   - checkout-service/deployment.yaml
@@ -16,3 +22,7 @@ patchesStrategicMerge:
   - product-catalog-service/deployment.yaml
   - recommendation-service/deployment.yaml
   - shipping-service/deployment.yaml
+
+secretGenerator:
+- name: digitalocean-dns
+  env: configs/do-token/pat.env
