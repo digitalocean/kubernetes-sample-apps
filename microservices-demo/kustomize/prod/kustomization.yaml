@@ -1,18 +1,44 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-namespace: microservices-demo
+namespace: microservices-demo-prod
+nameSuffix: -prod
+commonLabels:
+  variant: prod
 
-bases:
-  - "../base"
+resources:
+  - namespace.yaml
+  - ../base
 
-patchesStrategicMerge:
-  - cart-service/deployment.yaml
-  - checkout-service/deployment.yaml
-  - currency-service/deployment.yaml
-  - email-service/deployment.yaml
-  - frontend/deployment.yaml
-  - payment-service/deployment.yaml
-  - product-catalog-service/deployment.yaml
-  - recommendation-service/deployment.yaml
-  - shipping-service/deployment.yaml
+images:
+  - name: cartservice
+    newName: registry.digitalocean.com/microservices-demo/cartservice
+    newTag: 1.0.0
+  - name: checkoutservice
+    newName: registry.digitalocean.com/microservices-demo/checkoutservice
+    newTag: 1.0.0
+  - name: currencyservice
+    newName: registry.digitalocean.com/microservices-demo/currencyservice
+    newTag: 1.0.0
+  - name: emailservice
+    newName: registry.digitalocean.com/microservices-demo/emailservice
+    newTag: 1.0.0
+  - name: frontend
+    newName: registry.digitalocean.com/microservices-demo/frontend
+    newTag: 1.0.0
+  - name: paymentservice
+    newName: registry.digitalocean.com/microservices-demo/paymentservice
+    newTag: 1.0.0
+  - name: productcatalogservice
+    newName: registry.digitalocean.com/microservices-demo/productcatalogservice
+    newTag: 1.0.0
+  - name: recommendationservice
+    newName: registry.digitalocean.com/microservices-demo/recommendationservice
+    newTag: 1.0.0
+  - name: shippingservice
+    newName: registry.digitalocean.com/microservices-demo/shippingservice
+    newTag: 1.0.0
+
+secretGenerator:
+  - name: digitalocean-dns
+    env: configs/do/pat.env

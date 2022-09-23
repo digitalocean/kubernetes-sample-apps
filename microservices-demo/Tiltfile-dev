@@ -1,5 +1,5 @@
 ENVIRONMENT = "dev"
-DOCKER_REGISTRY = "registry.digitalocean.com/microservices-demo/" + ENVIRONMENT
+DOCKER_REGISTRY = "registry.digitalocean.com/microservices-demo/"
 
 allow_k8s_contexts("<YOUR_REMOTE_DEV_CLUSTER_CONTEXT_HERE>")
 
@@ -13,6 +13,6 @@ docker_build(DOCKER_REGISTRY + "/productcatalogservice", "src/productcatalogserv
 docker_build(DOCKER_REGISTRY + "/recommendationservice", "src/recommendationservice")
 docker_build(DOCKER_REGISTRY + "/shippingservice", "src/shippingservice")
 
-k8s_yaml(kustomize("kustomize/dev"))
+k8s_yaml(kustomize("kustomize/" + ENVIRONMENT))
 
 k8s_resource("frontend", port_forwards="9090")
