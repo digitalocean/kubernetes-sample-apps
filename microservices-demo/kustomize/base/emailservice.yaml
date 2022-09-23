@@ -58,20 +58,20 @@ spec:
             periodSeconds: 15
             initialDelaySeconds: 15
             exec:
-              command: ["/bin/grpc_health_probe", "-addr=:8080"]
+              command: ["/bin/grpc_health_probe", "-rpc-timeout=5s", "-addr=:8080"]
           livenessProbe:
             timeoutSeconds: 15
             periodSeconds: 15
             initialDelaySeconds: 15
             exec:
-              command: ["/bin/grpc_health_probe", "-addr=:8080"]
+              command: ["/bin/grpc_health_probe", "-rpc-timeout=5s", "-addr=:8080"]
           resources:
             requests:
               cpu: 100m
-              memory: 64Mi
+              memory: 128Mi
             limits:
               cpu: 200m
-              memory: 128Mi
+              memory: 256Mi
 
 ---
 apiVersion: v1

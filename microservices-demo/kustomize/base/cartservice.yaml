@@ -52,10 +52,10 @@ spec:
           resources:
             requests:
               cpu: 200m
-              memory: 64Mi
+              memory: 128Mi
             limits:
               cpu: 300m
-              memory: 128Mi
+              memory: 256Mi
           readinessProbe:
             timeoutSeconds: 15
             initialDelaySeconds: 20
@@ -64,7 +64,7 @@ spec:
                 [
                   "/bin/grpc_health_probe",
                   "-addr=:7070",
-                  "-rpc-timeout=5s",
+                  "-rpc-timeout=10s",
                   "-connect-timeout=10s",
                 ]
           livenessProbe:
@@ -76,7 +76,7 @@ spec:
                 [
                   "/bin/grpc_health_probe",
                   "-addr=:7070",
-                  "-rpc-timeout=5s",
+                  "-rpc-timeout=10s",
                   "-connect-timeout=10s",
                 ]
 
