@@ -1,8 +1,7 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-namespace: microservices-demo
-
 resources:
-  - namespace.yaml
-  - ../base
+  - dev
+  - staging
+  - prod
