@@ -2,7 +2,6 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 namespace: microservices-demo-prod
-nameSuffix: -prod
 commonLabels:
   variant: prod
 
@@ -38,7 +37,3 @@ images:
   - name: shippingservice
     newName: registry.digitalocean.com/microservices-demo/shippingservice
     newTag: 1.0.0
-
-secretGenerator:
-  - name: digitalocean-dns
-    env: configs/do/pat.env
