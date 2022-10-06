@@ -37,3 +37,23 @@ images:
   - name: shippingservice
     newName: registry.digitalocean.com/microservices-demo/shippingservice
     newTag: 1.0.0
+  
+replicas:
+  - name: cartservice
+    count: 2
+  - name: checkoutservice
+    count: 2
+  - name: currencyservice
+    count: 2
+  - name: emailservice
+    count: 2
+  - name: frontend
+    count: 2
+  - name: paymentservice
+    count: 2
+  - name: productcatalogservice
+    count: 2
+  - name: recommendationservice
+    count: 2
+  - name: shippingservice
+    count: 2
