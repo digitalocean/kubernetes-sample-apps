@@ -1,0 +1,52 @@
+# Common functions/utilities
+
+
+def create_namespace(name, allow_duplicates=False):
+    """Creates project namespace in the current Kubernetes cluster.
+    
+    Args:
+        name (string): Name of the Kubernetes namespace.
+        allow_duplicates (bool): Whether or not k8s should be allowed to have two
+            instances of the same resource.
+    """
+    k8s_yaml(
+        blob(
+            """
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+                name: {}
+            """.format(name)
+        ),
+        allow_duplicates=allow_duplicates
+    ) 
+
+def kustomize_images(images, registry, tag, dir_ctx):
+    """Kustomize project images using specified registry and tag
+
+    Args:
+        images (string): Docker images list.
+        registry (string): Docker registry endpoint to use.
+        tag (string): Docker image tag to use.
+        dir_ctx (string): kustomization.yaml dir path.
+
+    TO DO - All images use the same tag name. What about individual tagging ?
+    """
+    for image in images:
+        local(
+            command="kustomize edit set image {}={}/{}:{}".format(image, registry, image, tag),
+            dir=dir_ctx
+        )
+
+def kustomize_namespace(name, dir_ctx):
+    """Kustomize namespace for an overaly
+
+    Args:
+        name (string): Namespace to kustomize.
+        dir_ctx (string): kustomization.yaml dir path.
+    """
+    local(
+        command="kustomize edit set namespace {}".format(name),
+        dir=dir_ctx,
+        echo_off=True
+    )

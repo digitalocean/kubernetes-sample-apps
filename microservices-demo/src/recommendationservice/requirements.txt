@@ -4,6 +4,8 @@
 #
 #    pip-compile --output-file=requirements.txt requirements.in
 #
+attrs==22.1.0
+    # via pytest
 cachecontrol==0.12.11
     # via firebase-admin
 cachetools==5.2.0
@@ -87,6 +89,8 @@ httplib2==0.20.4
     #   google-auth-httplib2
 idna==2.10
     # via requests
+iniconfig==1.1.1
+    # via pytest
 msgpack==1.0.4
     # via cachecontrol
 opencensus==0.9.0
@@ -100,6 +104,10 @@ opencensus-ext-grpc==0.7.2
     # via -r requirements.in
 opencensus-ext-stackdriver==0.8.0
     # via -r requirements.in
+packaging==21.3
+    # via pytest
+pluggy==1.0.0
+    # via pytest
 proto-plus==1.22.1
     # via
     #   google-cloud-firestore
@@ -116,6 +124,8 @@ protobuf==3.20.1
     #   grpcio-health-checking
     #   grpcio-status
     #   proto-plus
+py==1.11.0
+    # via pytest
 pyasn1==0.4.8
     # via
     #   pyasn1-modules
@@ -124,6 +134,8 @@ pyasn1-modules==0.2.8
     # via google-auth
 pyparsing==2.4.7
     # via httplib2
+pytest==7.1.3
+    # via -r requirements.in
 python-json-logger==2.0.4
     # via -r requirements.in
 pyyaml==6.0
@@ -146,6 +158,8 @@ six==1.16.0
     #   google-auth
     #   google-auth-httplib2
     #   grpcio
+tomli==2.0.1
+    # via pytest
 uritemplate==3.0.1
     # via google-api-python-client
 urllib3==1.26.12

@@ -6,7 +6,6 @@ commonLabels:
   variant: staging
 
 resources:
-  - namespace.yaml
   - ../base
 
 images:

@@ -1,18 +1,86 @@
-ENVIRONMENT = "local"
-os.putenv("DOCKER_DEFAULT_PLATFORM", "linux/amd64")
+#########################################################################
+#
+#   Tiltfile logic
+#
+#########################################################################
 
-allow_k8s_contexts("docker-desktop")
 
-docker_build("cartservice", "src/cartservice/src")
-docker_build("checkoutservice", "src/checkoutservice")
-docker_build("currencyservice", "src/currencyservice")
-docker_build("emailservice", "src/emailservice")
-docker_build("frontend", "src/frontend")
-docker_build("paymentservice", "src/paymentservice")
-docker_build("productcatalogservice", "src/productcatalogservice")
-docker_build("recommendationservice", "src/recommendationservice")
-docker_build("shippingservice", "src/shippingservice")
+# Import functions from Tiltfile-lib
+load(
+    "./tilt-resources/Tiltfile-lib", 
+    "kustomize_images",
+    "kustomize_namespace"
+)
 
-k8s_yaml(kustomize("kustomize/" + ENVIRONMENT))
+# Import settings from tilt_config.json
+if not os.path.exists("./tilt_config.json"):
+    fail(
+        """
+        # ================================================ #
+        # Tilt config file not found in current directory! #
+        # Please copy a template from tilt-resources dir.  #
+        #                                                  #
+        # E.g.:                                            #
+        #    cp tilt-resources/local/tilt_config.json .    #
+        # ================================================ #
+        """
+    )
 
-k8s_resource("frontend", port_forwards="9000")
+config.define_string_list("allowed_contexts")
+config.define_string("default_registry")
+config.define_string("environment")
+config.define_string_list("microservices")
+config.define_string("namespace")
+config.define_string_list("port_forwards")
+cfg = config.parse()
+
+# Allow default K8S context
+allow_k8s_contexts(cfg.get("allowed_contexts"))
+
+if cfg.get("default_registry") != "":   
+    default_registry(cfg.get("default_registry"))
+
+# Build Docker images for project microservices
+for microservice in cfg.get("microservices"):
+    docker_build(
+        microservice,
+        # cartservice is an exception regarding source folder path
+        "src/{}/src".format(microservice) if "cartservice" in microservice else "src/{}".format(microservice)
+    )
+
+# # Kustomize project namespace for specific env
+# kustomize_namespace(
+#     name=cfg.get("namespace"), 
+#     dir_ctx="kustomize/{}".format(cfg.get("environment"))
+# )
+
+# # Kustomize project images for specific env
+# kustomize_images(
+#     images=cfg.get("microservices"),
+#     registry=cfg.get("default_registry"),
+#     tag="latest",
+#     dir_ctx="kustomize/{}".format(cfg.get("environment"))
+# )
+
+# Apply env specific kustomizations
+k8s_yaml(
+    kustomize("kustomize/{}".format(cfg.get("environment")))
+)
+
+# Port forwards
+for port_forward in cfg.get("port_forwards"):
+    mapping = port_forward.split(":")
+    if (len(mapping) != 2):
+        fail(
+            """
+            # ========================================================== #
+            # Invalid port_forwards entry specified in tilt_config.json! #
+            # Should be <resource>:<port_number>.                        #
+            #                                                            #
+            # E.g.: frontend:9090                                        #
+            # ========================================================== #
+            """.format(port_forward)
+        )
+    service = mapping[0]
+    port = mapping[1]
+    k8s_resource(service, port_forwards=port)

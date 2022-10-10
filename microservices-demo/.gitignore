@@ -1,0 +1,5 @@
+# macOS
+.DS_Store
+
+# Tilt settings
+/tilt_config.json
