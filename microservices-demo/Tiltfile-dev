@@ -2,7 +2,7 @@ ENVIRONMENT = "dev"
 os.putenv("DOCKER_DEFAULT_PLATFORM", "linux/amd64")
 DOCKER_REGISTRY = "registry.digitalocean.com/microservices-demo"
 
-allow_k8s_contexts("<YOUR_REMOTE_DEV_CLUSTER_CONTEXT_HERE>")
+allow_k8s_contexts("do-sgp1-do-microserv-demo-dev")
 
 docker_build(DOCKER_REGISTRY + "/cartservice", "src/cartservice/src")
 docker_build(DOCKER_REGISTRY + "/checkoutservice", "src/checkoutservice")
