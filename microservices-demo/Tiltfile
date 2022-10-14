@@ -15,4 +15,4 @@ docker_build("shippingservice", "src/shippingservice")
 
 k8s_yaml(kustomize("kustomize/" + ENVIRONMENT))
 
-k8s_resource("frontend", port_forwards="9000:8080")
+k8s_resource("frontend", port_forwards="9000")
