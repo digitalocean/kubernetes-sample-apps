@@ -11,29 +11,29 @@ resources:
 
 images:
   - name: cartservice
-    newName: registry.digitalocean.com/microservices-demo/cartservice
+    newName: registry.digitalocean.com/do-microserv-demo/cartservice
     newTag: 1.0.0
   - name: checkoutservice
-    newName: registry.digitalocean.com/microservices-demo/checkoutservice
+    newName: registry.digitalocean.com/do-microserv-demo/checkoutservice
     newTag: 1.0.0
   - name: currencyservice
-    newName: registry.digitalocean.com/microservices-demo/currencyservice
+    newName: registry.digitalocean.com/do-microserv-demo/currencyservice
     newTag: 1.0.0
   - name: emailservice
-    newName: registry.digitalocean.com/microservices-demo/emailservice
+    newName: registry.digitalocean.com/do-microserv-demo/emailservice
     newTag: 1.0.0
   - name: frontend
-    newName: registry.digitalocean.com/microservices-demo/frontend
+    newName: registry.digitalocean.com/do-microserv-demo/frontend
     newTag: 1.0.0
   - name: paymentservice
-    newName: registry.digitalocean.com/microservices-demo/paymentservice
+    newName: registry.digitalocean.com/do-microserv-demo/paymentservice
     newTag: 1.0.0
   - name: productcatalogservice
-    newName: registry.digitalocean.com/microservices-demo/productcatalogservice
+    newName: registry.digitalocean.com/do-microserv-demo/productcatalogservice
     newTag: 1.0.0
   - name: recommendationservice
-    newName: registry.digitalocean.com/microservices-demo/recommendationservice
+    newName: registry.digitalocean.com/do-microserv-demo/recommendationservice
     newTag: 1.0.0
   - name: shippingservice
-    newName: registry.digitalocean.com/microservices-demo/shippingservice
+    newName: registry.digitalocean.com/do-microserv-demo/shippingservice
     newTag: 1.0.0
