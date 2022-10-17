@@ -1,0 +1,21 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: rsdasa.net
+  # Cert-Manager will put the resulting Secret in the same Kubernetes namespace as the Certificate.
+  namespace: microservices-demo-staging
+spec:
+  # Secret name to create, where the private key and certificate should be stored.
+  secretName: rsdasa.net
+  # What Issuer to use for getting the certificate.
+  issuerRef:
+    name: letsencrypt-nginx-wcard
+    kind: Issuer
+    group: cert-manager.io
+    # Common name to be used on the Certificate.
+  commonName:
+    "*.rsdasa.net"
+    # List of DNS subjectAltNames to be set on the Certificate.
+  dnsNames:
+    - "rsdasa.net"
+    - "*.rsdasa.net"
