@@ -6,7 +6,7 @@ loki:
   # ======================== REMOTE STORAGE SETUP FOR DO SPACES ==============================
   # Uncomment the configuration below, to enable remote storage setup for `DO Spaces`
   # Make sure to replace the <> placeholders for the `aws` subsection accordingly
-  # config:
+  config:
   schema_config:
     configs:
       - from: "2020-10-24"
