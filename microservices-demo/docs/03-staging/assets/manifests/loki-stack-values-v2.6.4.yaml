@@ -1,0 +1,58 @@
+##
+## Starter Kit configuration for Loki stack
+##
+loki:
+  enabled: true
+  # ======================== REMOTE STORAGE SETUP FOR DO SPACES ==============================
+  # Uncomment the configuration below, to enable remote storage setup for `DO Spaces`
+  # Make sure to replace the <> placeholders for the `aws` subsection accordingly
+  # config:
+  # schema_config:
+  #   configs:
+  #     - from: "2020-10-24"
+  #       store: boltdb-shipper
+  #       object_store: aws
+  #       schema: v11
+  #       index:
+  #         prefix: index_
+  #         period: 24h
+  # storage_config:
+  #   boltdb_shipper:
+  #     cache_ttl: 24h # Can be increased for faster performance over longer query periods, uses more disk space
+  #     shared_store: aws
+  #   aws:
+  #     bucketnames: <YOUR_DO_SPACES_BUCKET_NAME_HERE>
+  #     endpoint: <YOUR_DO_SPACES_BUCKET_ENDPOINT_HERE>  # e.g.: nyc1.digitaloceanspaces.com
+  #     region: <YOUR_DO_SPACES_BUCKET_REGION_HERE>      # e.g.: nyc1
+  #     access_key_id: <YOUR_DO_SPACES_ACCESS_KEY_HERE>
+  #     secret_access_key: <YOURDO_SPACES_SECRET_KEY_HERE>
+  #     s3forcepathstyle: true
+  # Uncomment the configuration below, to enable DO Block Storage storage setup for `DO Volumes`
+  # persistence:
+  #   enabled: true
+  #   storageClassName: do-block-storage
+  #   accessModes: ["ReadWriteOnce"]
+  #   size: 5Gi
+
+promtail:
+  enabled: true
+  #
+  # Enable Promtail service monitoring
+  # serviceMonitor:
+  #   enabled: true
+  #
+  # User defined pipeline stages
+  # pipelineStages:
+  #   - docker: {}
+  #   - drop:
+  #       source: namespace
+  #       expression: "kube-.*"
+
+fluent-bit:
+  enabled: false
+
+grafana:
+  enabled: false
+
+prometheus:
+  enabled: false

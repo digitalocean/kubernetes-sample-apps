@@ -1,0 +1,98 @@
+##
+## Starter Kit configuration for Prometheus stack
+##
+
+## Create default rules for monitoring the cluster
+#
+# Disable `etcd` and `kubeScheduler` rules (managed by DOKS, so metrics are not accesible)
+defaultRules:
+  create: true
+  rules:
+    etcd: false
+    kubeScheduler: false
+
+## Component scraping kube scheduler
+##
+# Disabled because it's being managed by DOKS, so it's not accessible
+kubeScheduler:
+  enabled: false
+
+## Component scraping etcd
+##
+# Disabled because it's being managed by DOKS, so it's not accessible
+kubeEtcd:
+  enabled: false
+
+alertmanager:
+  ## Deploy alertmanager
+  ##
+  enabled: true
+  # config:
+  #   global:
+  #     resolve_timeout: 5m
+  #     slack_api_url: "<YOUR_SLACK_APP_INCOMING_WEBHOOK_URL_HERE>"
+  #   route:
+  #     receiver: "null"
+  #     repeat_interval: 12h
+  #     routes:
+  #       - receiver: "slack-notifications"
+  #         matchers:
+  #           - alertname="OnlineBoutiqueInstanceDown"
+  #         continue: false
+  #   receivers:
+  #     - name: "null"
+  #     - name: "slack-notifications"
+  #       slack_configs:
+  #         - channel: "#<YOUR_SLACK_CHANNEL_NAME_HERE>"
+  #           send_resolved: true
+  #           title: "{{ range .Alerts }}{{ .Annotations.summary }}\n{{ end }}"
+  #           text: "{{ range .Alerts }}{{ .Annotations.description }}\n{{ end }}"
+
+# additionalPrometheusRulesMap:
+#   rule-name:
+#     groups:
+#     - name: online-boutique-instance-down
+#       rules:
+#         - alert: OnlineBoutiqueInstanceDown
+#           expr: sum(kube_pod_owner{namespace="microservices-demo-staging"}) by (namespace) < 10
+#           for: 1m
+#           labels:
+#             severity: 'critical'
+#             alert_type: 'infrastructure'
+#           annotations:
+#             description: ' The Number of pods from the namespace {{ $labels.namespace }} is lower than the expected 10.'
+#             summary: 'Pod in {{ $labels.namespace }} namespace down'
+
+grafana:
+  enabled: true
+  adminPassword: prom-operator # Please change the default password in production !!!
+
+  # # Starter Kit setup for DigitalOcean Block Storage
+  # persistence:
+  #   enabled: true
+  #   storageClassName: do-block-storage
+  #   accessModes: ["ReadWriteOnce"]
+  #   size: 5Gi
+
+## Manages Prometheus and Alertmanager components
+##
+prometheusOperator:
+  enabled: true
+
+## Deploy a Prometheus instance
+##
+prometheus:
+  enabled: true
+
+  ## Prometheus StorageSpec for persistent data
+  ## ref: https://github.com/prometheus-operator/prometheus-operator/blob/master/Documentation/user-guides/storage.md
+  ##
+  # prometheusSpec:
+  #   storageSpec:
+  #     volumeClaimTemplate:
+  #       spec:
+  #         storageClassName: do-block-storage
+  #         accessModes: ["ReadWriteOnce"]
+  #         resources:
+  #           requests:
+  #             storage: 5Gi
