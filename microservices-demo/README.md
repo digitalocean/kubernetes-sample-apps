@@ -9,14 +9,15 @@ This application is a clone of this [GoogleCloudPlatform](https://github.com/Goo
 
 ## Quick Start
 
-1. Run the following command in this project root directory to deploy the **microservices-demo** app to your local Kubernetes cluster:
+1. Run the following command in the project root directory to deploy the **microservices-demo** app to your local Kubernetes cluster:
 
     ```shell
+    cp tilt-resources/local/tilt_config.json .
     tilt up
     ```
 
 2. Open Tilt [web interface](http://localhost:10350/), and wait for all services to be ready.
-3. Access the [web frontend](http://localhost:9000/) in a browser.
+3. Access the [web frontend](http://localhost:9090/) in a browser.
 
 ## Cleaning Up
 

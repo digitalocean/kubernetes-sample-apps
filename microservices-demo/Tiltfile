@@ -35,6 +35,9 @@ config.define_string("namespace")
 config.define_string_list("port_forwards")
 cfg = config.parse()
 
+# Compatibilty setting for ARM arch
+os.putenv("DOCKER_DEFAULT_PLATFORM", "linux/amd64")
+
 # Allow default K8S context as stated in the tilt_config.json file
 allow_k8s_contexts(cfg.get("allowed_contexts"))
 
