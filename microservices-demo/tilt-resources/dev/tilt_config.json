@@ -13,6 +13,7 @@
         "paymentservice",
         "productcatalogservice",
         "recommendationservice",
+        "redis",
         "shippingservice"
     ],
     "namespace": "microservices-demo-dev",

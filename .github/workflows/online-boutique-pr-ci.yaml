@@ -10,6 +10,7 @@ on:
   #   paths-ignore:
   #     - "**/README.md"
   #     - "kustomize/**"
+  #     - "argocd/**"
   #     - ".github/workflows/*"
 
 # Do not allow concurrent workflows for PRs
@@ -22,7 +23,6 @@ env:
   CLUSTER_NAME: "microservices-demo-dev"
   REGION: "nyc1"
   K8S_NAMESPACE: "microservices-demo-${{ github.event.pull_request.number }}"
-  PROJECT_DIR: "microservices-demo"
   PROJECT_NAME: "online-boutique"
 
 jobs:
@@ -73,7 +73,6 @@ jobs:
             cd src/${{ matrix.project_name }}
             go test 
           )
-        working-directory: ${{ env.PROJECT_DIR }}
 
       - name: Set up C# env
         if: ${{ matrix.project_language == 'csharp' }}
@@ -86,7 +85,6 @@ jobs:
         if: ${{ matrix.project_language == 'csharp' }}
         timeout-minutes: 5
         run: dotnet test src/${{ matrix.project_name }}/
-        working-directory: ${{ env.PROJECT_DIR }}
 
       - name: Set up NodeJS env
         if: ${{ matrix.project_language == 'javascript' }}
@@ -103,7 +101,6 @@ jobs:
             npm install
             npm run test 
           )
-        working-directory: ${{ env.PROJECT_DIR }}
 
       - name: Set up Python env
         if: ${{ matrix.project_language == 'python' }}
@@ -120,7 +117,6 @@ jobs:
             pip install -r requirements.txt
             pytest
           )
-        working-directory: ${{ env.PROJECT_DIR }}
 
   # Run deployment tests (smoke tests)
   # You can add integration tests as well
@@ -164,12 +160,11 @@ jobs:
             --default_registry "${{ env.DOCR_ENDPOINT }}" \
             --environment "dev" \
             --namespace "${{ env.K8S_NAMESPACE }}"
-        working-directory: ${{ env.PROJECT_DIR }}
 
       - name: Build loadgenerator image
         uses: docker/build-push-action@v3
         with:
-          context: "${{ env.PROJECT_DIR }}/src/loadgenerator"
+          context: "src/loadgenerator"
           push: true
           tags: "${{ env.DOCR_ENDPOINT }}/loadgenerator"
 
@@ -209,14 +204,13 @@ jobs:
           # Print final results
           echo "[INFO] Load generator results"
           kubectl logs -l app=loadgenerator -n ${{ env.K8S_NAMESPACE }} | tail -20
-        working-directory: "${{ env.PROJECT_DIR }}/src/loadgenerator"
+        working-directory: "src/loadgenerator"
 
       - name: Clean up Tilt microservices environment
         if: ${{ always() }}
         run: |
           # Remove all microservices and the namespace created by Tilt
           tilt down --delete-namespaces -- --namespace "${{ env.K8S_NAMESPACE }}"
-        working-directory: ${{ env.PROJECT_DIR }}
 
       - name: Clean up Tilt docker images from registry
         if: ${{ always() }}

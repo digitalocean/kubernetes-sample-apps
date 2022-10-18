@@ -10,6 +10,7 @@ on:
   #   paths-ignore:
   #     - "**/README.md"
   #     - "kustomize/**"
+  #     - "argocd/**"
   #     - ".github/workflows/*"
 
 # Do not allow concurrent workflows
@@ -21,7 +22,6 @@ env:
   CI_COMMIT_AUTHOR: "CI GitHub Actions"
   CI_COMMIT_AUTHOR_EMAIL: "gh-actions@noreply.github.com"
   DOCR_ENDPOINT: "registry.digitalocean.com/microservices-demo"
-  PROJECT_DIR: "microservices-demo"
   PROJECT_NAME: "online-boutique"
 
 jobs:
@@ -45,6 +45,8 @@ jobs:
         run: |
           echo "[INFO] Not implemented yet!"
 
+  # Build and push project images in parallel using a matrix strategy
+  # Cuts down build time
   build-and-push-images:
     needs: deployment-tests
     runs-on: ubuntu-latest
@@ -75,10 +77,13 @@ jobs:
       - name: Build and push image
         uses: docker/build-push-action@v3
         with:
-          context: "${{ env.PROJECT_DIR }}/src/${{ matrix.project }}/${{ matrix.project == 'cartservice' && 'src' || ''}}"
+          # cartservice is an exception - Dockerfile is placed in src/cartservice/src subfolder
+          context: "src/${{ matrix.project }}/${{ matrix.project == 'cartservice' && 'src' || ''}}"
           push: true
           tags: "${{ env.DOCR_ENDPOINT }}/${{ matrix.project }}:${{ github.sha }}"
 
+  # Kustomize image field for each microservice present in the `src/` dir
+  # Finally, commit changes to main branch and let ArgoCD take over afterwards
   apply-kustomize-changes:
     needs: build-and-push-images
     runs-on: ubuntu-latest
@@ -103,7 +108,6 @@ jobs:
               kustomize edit set image $microservice=${{ env.DOCR_ENDPOINT }}/${microservice}:${{ github.sha }}
             )
           done
-        working-directory: ${{ env.PROJECT_DIR }}
 
       - name: Commit Kustomize manifests for dev env
         run: |
@@ -111,7 +115,6 @@ jobs:
           git config --global user.email "${{ env.CI_COMMIT_AUTHOR_EMAIL }}"
           git add kustomize/dev/
           git commit -m "Bump docker images tag"
-        working-directory: ${{ env.PROJECT_DIR }}
 
       - name: Push changes
         uses: ad-m/github-push-action@master
