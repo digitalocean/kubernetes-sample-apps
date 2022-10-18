@@ -1,0 +1,23 @@
+{
+    "allowed_contexts": [
+        "do-nyc1-microservices-demo-dev"
+    ],
+    "default_registry": "registry.digitalocean.com/microservices-demo",
+    "environment": "dev",
+    "microservices": [
+        "cartservice",
+        "checkoutservice",
+        "currencyservice",
+        "emailservice",
+        "frontend",
+        "paymentservice",
+        "productcatalogservice",
+        "recommendationservice",
+        "redis",
+        "shippingservice"
+    ],
+    "namespace": "microservices-demo-dev",
+    "port_forwards": [
+        "frontend:9090"
+    ]
+}

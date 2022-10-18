@@ -1,0 +1,226 @@
+name: Online Boutique PR CI
+
+on:
+  # Used for testing only (can be disabled afterwards)
+  workflow_dispatch:
+  # Uncomment below lines to enable this workflow on main branch PR events
+  # pull_request:
+  #   branches:
+  #     - main
+  #   paths-ignore:
+  #     - "**/README.md"
+  #     - "kustomize/**"
+  #     - "argocd/**"
+  #     - ".github/workflows/*"
+
+# Do not allow concurrent workflows for PRs
+# If disabled, leads to memory exhaustion on the DOKS dev cluster
+concurrency: pr-ci-dev
+
+# Global environment variables
+env:
+  DOCR_ENDPOINT: "registry.digitalocean.com/microservices-demo"
+  CLUSTER_NAME: "microservices-demo-dev"
+  REGION: "nyc1"
+  K8S_NAMESPACE: "microservices-demo-${{ github.event.pull_request.number }}"
+  PROJECT_NAME: "online-boutique"
+
+jobs:
+  # Run unit tests in parallel using below matrix to cut down time
+  # Unit tests are standalone and should not raise conflicts
+  # Each microservice is written in a specific language, hence it's added to the matrix
+  unit-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - project_name: cartservice
+            project_language: csharp
+          - project_name: checkoutservice
+            project_language: golang
+          - project_name: currencyservice
+            project_language: javascript
+          - project_name: emailservice
+            project_language: python
+          - project_name: frontend
+            project_language: golang
+          - project_name: paymentservice
+            project_language: javascript
+          - project_name: productcatalogservice
+            project_language: golang
+          - project_name: recommendationservice
+            project_language: python
+          - project_name: shippingservice
+            project_language: golang
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{github.event.pull_request.head.ref}}
+          repository: ${{github.event.pull_request.head.repo.full_name}}
+
+      - name: Set up Go env
+        if: ${{ matrix.project_language == 'golang' }}
+        uses: actions/setup-go@v3
+        with:
+          go-version: "1.19"
+
+      - name: Go Unit Tests
+        if: ${{ matrix.project_language == 'golang' }}
+        timeout-minutes: 5
+        run: |
+          ( 
+            cd src/${{ matrix.project_name }}
+            go test 
+          )
+
+      - name: Set up C# env
+        if: ${{ matrix.project_language == 'csharp' }}
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: "6.0"
+          include-prerelease: true
+
+      - name: C# Unit Tests
+        if: ${{ matrix.project_language == 'csharp' }}
+        timeout-minutes: 5
+        run: dotnet test src/${{ matrix.project_name }}/
+
+      - name: Set up NodeJS env
+        if: ${{ matrix.project_language == 'javascript' }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Javascript Unit Tests
+        if: ${{ matrix.project_language == 'javascript' }}
+        timeout-minutes: 5
+        run: |
+          ( 
+            cd src/${{ matrix.project_name }}
+            npm install
+            npm run test 
+          )
+
+      - name: Set up Python env
+        if: ${{ matrix.project_language == 'python' }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.7"
+
+      - name: Python Unit Tests
+        if: ${{ matrix.project_language == 'python' }}
+        timeout-minutes: 5
+        run: |
+          ( 
+            cd src/${{ matrix.project_name }}
+            pip install -r requirements.txt
+            pytest
+          )
+
+  # Run deployment tests (smoke tests)
+  # You can add integration tests as well
+  # Please bear in mind that more tests means increased workflow run time
+  # With workflow concurrency disabled, means more waiting time for other PRs in the queue
+  deployment-tests:
+    needs: unit-tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{github.event.pull_request.head.ref}}
+          repository: ${{github.event.pull_request.head.repo.full_name}}
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Log in to DOCR with short-lived credentials
+        run: doctl registry login --expiry-seconds 1200
+
+      - name: Set up K8S tools
+        uses: yokawasa/action-setup-kube-tools@v0.8.2
+        with:
+          kubectl: "1.25.2"
+          kustomize: "4.5.7"
+          tilt: "0.30.9"
+
+      - name: Configure kubectl for DOKS with short-lived credentials
+        run: doctl kubernetes cluster kubeconfig save ${{ env.CLUSTER_NAME }} --expiry-seconds 1200
+
+      - name: Deploy microservices to DOKS
+        timeout-minutes: 10
+        run: |
+          # Bring all microservices up using Tilt and wait for all deployments
+          cp tilt-resources/dev/tilt_config.json .
+          tilt ci -- \
+            --allowed_contexts "do-${{ env.REGION }}-${{ env.CLUSTER_NAME }}" \
+            --default_registry "${{ env.DOCR_ENDPOINT }}" \
+            --environment "dev" \
+            --namespace "${{ env.K8S_NAMESPACE }}"
+
+      - name: Build loadgenerator image
+        uses: docker/build-push-action@v3
+        with:
+          context: "src/loadgenerator"
+          push: true
+          tags: "${{ env.DOCR_ENDPOINT }}/loadgenerator"
+
+      - name: Smoke tests
+        timeout-minutes: 10
+        run: |
+          # Prepare load generator
+          # Inject workflow custom docker image
+          sed -i "s#<LOAD_GENERATOR_IMAGE>#${{ env.DOCR_ENDPOINT }}/loadgenerator#g" loadgenerator.yaml
+
+          # Deploy load generator
+          kubectl apply -f loadgenerator.yaml -n ${{ env.K8S_NAMESPACE }}
+
+          # Wait for load generator deployment to be ready
+          kubectl wait --for=condition=available --timeout=60s deployment/loadgenerator -n ${{ env.K8S_NAMESPACE }} || {
+            # Show why load generator failed to start
+            echo "[INFO] Load generator pod events"
+            kubectl describe pod -l app=loadgenerator -n ${{ env.K8S_NAMESPACE }} | tail -10
+            exit 1
+          }
+
+          # Run smoke tests
+          REQUEST_COUNT="0"
+          while [[ "$REQUEST_COUNT"  -lt "50"  ]]; do
+            sleep 5
+            REQUEST_COUNT=$(kubectl logs -l app=loadgenerator -n ${{ env.K8S_NAMESPACE }} | grep Aggregated | awk '{print $2}')
+          done
+          # ensure there are no errors hitting endpoints
+          ERROR_COUNT=$(kubectl logs -l app=loadgenerator -n ${{ env.K8S_NAMESPACE }} | grep Aggregated | awk '{print $3}' | sed "s/[(][^)]*[)]//g")
+          if [[ "$ERROR_COUNT" -gt "0" ]]; then
+            # Print final results
+            echo "[INFO] Load generator results"
+            kubectl logs -l app=loadgenerator -n ${{ env.K8S_NAMESPACE }} | tail -20
+            exit 1
+          fi
+
+          # Print final results
+          echo "[INFO] Load generator results"
+          kubectl logs -l app=loadgenerator -n ${{ env.K8S_NAMESPACE }} | tail -20
+        working-directory: "src/loadgenerator"
+
+      - name: Clean up Tilt microservices environment
+        if: ${{ always() }}
+        run: |
+          # Remove all microservices and the namespace created by Tilt
+          tilt down --delete-namespaces -- --namespace "${{ env.K8S_NAMESPACE }}"
+
+      - name: Clean up Tilt docker images from registry
+        if: ${{ always() }}
+        run: |
+          # Remove Tilt docker images from registry
+          for tilt_repo in $(docker images --format "{{.Repository}}:{{.Tag}}" | grep "tilt-.*[a-z|0-9]"); do
+            repo_and_tag="${tilt_repo##*/}"
+            repo="${repo_and_tag%%:*}"
+            tag="${repo_and_tag##*:}"
+            echo "[INFO] Deleting tag $tag from repo $repo ..."
+            doctl registry repository delete-tag "$repo" "$tag" -f
+          done
+          echo "[INFO] Remember to run the DOCR garbage collector from time to time!"

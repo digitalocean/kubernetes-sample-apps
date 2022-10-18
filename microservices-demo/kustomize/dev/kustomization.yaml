@@ -6,7 +6,6 @@ commonLabels:
   variant: dev
 
 resources:
-  - namespace.yaml
   - ../base
 
 images:

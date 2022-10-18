@@ -1,0 +1,23 @@
+{
+    "allowed_contexts": [
+        "docker-desktop"
+    ],
+    "default_registry": "",
+    "environment": "local",
+    "microservices": [
+        "cartservice",
+        "checkoutservice",
+        "currencyservice",
+        "emailservice",
+        "frontend",
+        "paymentservice",
+        "productcatalogservice",
+        "recommendationservice",
+        "redis",
+        "shippingservice"
+    ],
+    "namespace": "microservices-demo-local",
+    "port_forwards": [
+        "frontend:9090"
+    ]
+}
