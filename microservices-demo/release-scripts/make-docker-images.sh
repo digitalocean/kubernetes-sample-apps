@@ -37,10 +37,9 @@ while IFS= read -d $'\0' -r dir; do
     (
         cd "${builddir}"
         log "Building: ${image}"
-        docker buildx build --platform=linux/amd64 -t "${image}" .
+        docker buildx build --platform linux/amd64 -t "${image}" --push .
 
         log "Pushing: ${image}"
-        docker push "${image}"
     )
 done < <(find "${SCRIPTDIR}/../src" -mindepth 1 -maxdepth 1 -type d -print0)
 
