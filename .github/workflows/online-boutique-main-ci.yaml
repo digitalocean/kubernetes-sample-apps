@@ -19,8 +19,8 @@ concurrency: main-ci-dev
 
 # Global environment variables
 env:
-  CI_COMMIT_AUTHOR: "CI GitHub Actions"
-  CI_COMMIT_AUTHOR_EMAIL: "gh-actions@noreply.github.com"
+  CI_COMMIT_AUTHOR: "GitHub CI Actions"
+  CI_COMMIT_AUTHOR_EMAIL: "gh-ci-actions@noreply.github.com"
   DOCR_ENDPOINT: "registry.digitalocean.com/microservices-demo"
   PROJECT_NAME: "online-boutique"
 
@@ -114,7 +114,7 @@ jobs:
           git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
           git config --global user.email "${{ env.CI_COMMIT_AUTHOR_EMAIL }}"
           git add kustomize/dev/
-          git commit -m "Bump docker images tag"
+          git commit -m "[CI] Bump docker images tag to ${{ github.sha }}"
 
       - name: Push changes
         uses: ad-m/github-push-action@master
