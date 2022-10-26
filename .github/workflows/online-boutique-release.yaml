@@ -1,0 +1,95 @@
+name: Online Boutique Release
+
+on:
+  workflow_dispatch:
+  # push:
+  #   # Trigger on push events to any tag matching semantic versioning
+  #   tags:
+  #     - 'v[0-9]+\.[0-9]+\.[0-9]+'
+
+env:
+  RELEASE_COMMIT_AUTHOR: "GitHub Release Actions"
+  RELEASE_COMMIT_AUTHOR_EMAIL: "gh-release-actions@noreply.github.com"
+  DOCR_ENDPOINT: "registry.digitalocean.com/microservices-demo"
+  PROJECT_NAME: "online-boutique"
+
+jobs:
+  validation-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "[INFO] Not implemented yet!"
+
+  build-and-push-release-images:
+    needs: validation-tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project:
+          - cartservice
+          - checkoutservice
+          - currencyservice
+          - emailservice
+          - frontend
+          - paymentservice
+          - productcatalogservice
+          - recommendationservice
+          - shippingservice
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Log in to DOCR with short-lived credentials
+        run: doctl registry login --expiry-seconds 600
+
+      - name: Build and push image
+        uses: docker/build-push-action@v3
+        with:
+          # cartservice is an exception - Dockerfile is placed in src/cartservice/src subfolder
+          context: "src/${{ matrix.project }}/${{ matrix.project == 'cartservice' && 'src' || ''}}"
+          push: true
+          tags: "${{ env.DOCR_ENDPOINT }}/${{ matrix.project }}:${{ github.ref_name }}"
+
+  # Kustomize image field for each microservice present in the `src/` dir
+  # Finally, commit changes to main branch and let ArgoCD take over afterwards
+  apply-kustomize-changes:
+    needs: build-and-push-release-images
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up K8S tools
+        uses: yokawasa/action-setup-kube-tools@v0.8.2
+        with:
+          kustomize: "4.5.7"
+
+      - name: Kustomize staging environment images
+        run: |
+          for microservice in src/*/; do
+            microservice="$(basename $microservice)"
+            if [[ "$microservice" == "loadgenerator" ]]; then
+              continue
+            fi
+            (
+              cd kustomize/staging/
+              kustomize edit set image $microservice=${{ env.DOCR_ENDPOINT }}/${microservice}:${{ github.ref_name }}
+            )
+          done
+
+      - name: Commit Kustomize manifests for staging env
+        run: |
+          git config --global user.name "${{ env.RELEASE_COMMIT_AUTHOR }}"
+          git config --global user.email "${{ env.RELEASE_COMMIT_AUTHOR_EMAIL }}"
+          git add kustomize/staging/
+          git commit -m "[Release] Bump docker images tag to ${{ github.ref_name }}"
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
