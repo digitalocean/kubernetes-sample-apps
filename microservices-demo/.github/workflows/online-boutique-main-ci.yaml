@@ -1,0 +1,122 @@
+name: Online Boutique CI Main
+
+on:
+  # Used for testing only (can be disabled afterwards)
+  workflow_dispatch:
+  # Uncomment below lines to enable this workflow on push to main events
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - "**/README.md"
+      - "kustomize/**"
+      - "argocd/**"
+      - ".github/workflows/*"
+
+# Do not allow concurrent workflows
+# Changes should be delivered one a time as code is merged into the main branch
+concurrency: main-ci-dev
+
+# Global environment variables
+env:
+  CI_COMMIT_AUTHOR: "GitHub CI Actions / Dmitriy Salynin"
+  CI_COMMIT_AUTHOR_EMAIL: "dsalynin@gmail.com"
+  DOCR_ENDPOINT: "registry.digitalocean.com/do-microserv-demo"
+  PROJECT_NAME: "online-boutique"
+
+jobs:
+  # There's no point to run unit tests again after PR merge
+  # Unit testing deals with changes for the affected components,
+  #   and that it is already taken care in the PR workflow
+
+  # What it makes sense, is to run integration tests,
+  #   to see if the whole application is impacted after merging the changes
+  #
+  # Run deployment tests (integration tests)
+  # Please bear in mind that more tests means increased workflow run time
+  # With workflow concurrency disabled, means more waiting time for other PRs in the queue
+  deployment-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run integration tests
+        run: |
+          echo "[INFO] Not implemented yet!"
+
+  # Build and push project images in parallel using a matrix strategy
+  # Cuts down build time
+  build-and-push-images:
+    needs: deployment-tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project:
+          - cartservice
+          - checkoutservice
+          - currencyservice
+          - emailservice
+          - frontend
+          - paymentservice
+          - productcatalogservice
+          - recommendationservice
+          - shippingservice
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Log in to DOCR with short-lived credentials
+        run: doctl registry login --expiry-seconds 600
+
+      - name: Build and push image
+        uses: docker/build-push-action@v3
+        with:
+          # cartservice is an exception - Dockerfile is placed in src/cartservice/src subfolder
+          context: "src/${{ matrix.project }}/${{ matrix.project == 'cartservice' && 'src' || ''}}"
+          push: true
+          tags: "${{ env.DOCR_ENDPOINT }}/${{ matrix.project }}:${{ github.sha }}"
+
+  # Kustomize image field for each microservice present in the `src/` dir
+  # Finally, commit changes to main branch and let ArgoCD take over afterwards
+  apply-kustomize-changes:
+    needs: build-and-push-images
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up K8S tools
+        uses: yokawasa/action-setup-kube-tools@v0.8.2
+        with:
+          kustomize: "4.5.7"
+
+      - name: Kustomize dev environment images
+        run: |
+          for microservice in src/*/; do
+            microservice="$(basename $microservice)"
+            if [[ "$microservice" == "loadgenerator" ]]; then
+              continue
+            fi
+            (
+              cd kustomize/dev
+              kustomize edit set image $microservice=${{ env.DOCR_ENDPOINT }}/${microservice}:${{ github.sha }}
+            )
+          done
+
+      - name: Commit Kustomize manifests for dev env
+        run: |
+          git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
+          git config --global user.email "${{ env.CI_COMMIT_AUTHOR_EMAIL }}"
+          git add kustomize/dev/
+          git commit -m "[CI] Bump docker images tag to ${{ github.sha }}"
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
