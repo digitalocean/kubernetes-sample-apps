@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+# set -euo pipefail
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 log() { echo "$1" >&2; }
@@ -28,6 +28,10 @@ while IFS= read -d $'\0' -r dir; do
         if [ $svcname == "recommendationservice" ]
         then
             pack build ${image} --env "GOOGLE_ENTRYPOINT=recommendationservice/recommendation_server.py" --builder gcr.io/buildpacks/builder:v1
+        fi
+        if [ $svcname == "loadgenerator" ]
+        then 
+            continue
         fi
         pack build ${image} --builder gcr.io/buildpacks/builder:v1
         docker push ${image}
