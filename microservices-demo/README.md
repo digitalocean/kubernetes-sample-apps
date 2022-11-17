@@ -1,5 +1,9 @@
 # Overview
 
+**Note:**
+
+**This demo application serves as a companion for the [Kubernetes Adoption Journey](https://digitalocean.github.io/k8s-adoption-journey/) project. Please follow the Kubernetes adoption journey project for more information and comprehensive guidelines.**
+
 This application is a clone of this [GoogleCloudPlatform](https://github.com/GoogleCloudPlatform/microservices-demo) project. It will be used as a demo for the K8s adoption journey. This clone of the project has been stripped down to focus only on the major parts as required by the adoption journey.
 
 ## Prerequisites
