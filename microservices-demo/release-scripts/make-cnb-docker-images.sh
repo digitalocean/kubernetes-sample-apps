@@ -28,7 +28,7 @@ while IFS= read -d $'\0' -r dir; do
         log "Building and pushing: ${image}"
         ## we are not using the --publish pack flag due to an issue preventing the pack CLI from pushing to DOCR
         pack build ${image} --builder gcr.io/buildpacks/builder:v1
-        # docker push ${image}
+        docker push ${image}
     )
 done < <(find "${SCRIPTDIR}/../src" -mindepth 1 -maxdepth 1 -type d -print0)
 
