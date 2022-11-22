@@ -1,0 +1,58 @@
+name: Online Boutique Snyk IAC Scan
+
+on:
+  # pull_request:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - "argocd/**"
+  #     - "kustomize/**"
+
+  # Below configuration is used for manual workflow dispatch
+  workflow_dispatch:
+    inputs:
+      snyk_fail_threshold:
+        description: |
+          Sets fail threshold for Snyk 
+          (low | medium | high | critical)
+        required: true
+        default: "high"
+
+env:
+  PROJECT_NAME: "online-boutique"
+  SNYK_FAIL_THRESHOLD: "high"
+
+jobs:
+  iac-security-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+
+      - name: Install Snyk
+        uses: snyk/actions/setup@master
+
+      - name: Check for Kubernetes manifests vulnerabilities
+        run: |
+          snyk iac test \
+            --severity-threshold=${{ github.event.inputs.snyk_fail_threshold || env.SNYK_FAIL_THRESHOLD }} \
+            --target-name=${{ env.PROJECT_NAME }} \
+            --target-reference="kustomize-PR#${{ github.event.pull_request.number }}" \
+            --report
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        working-directory: kustomize
+
+      - name: Check for Argo CD manifests vulnerabilities
+        run: |
+          snyk iac test \
+            --severity-threshold=${{ github.event.inputs.snyk_fail_threshold || env.SNYK_FAIL_THRESHOLD }} \
+            --target-name=${{ env.PROJECT_NAME }} \
+            --target-reference="argocd-PR#${{ github.event.pull_request.number }}" \
+            --report
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        working-directory: argocd

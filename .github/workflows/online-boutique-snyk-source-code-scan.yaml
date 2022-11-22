@@ -1,0 +1,107 @@
+name: Online Boutique Snyk Source Code Scan
+
+on:
+  # pull_request:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - "src/**"
+
+  # Below configuration is used for manual workflow dispatch
+  workflow_dispatch:
+    inputs:
+      snyk_fail_threshold:
+        description: |
+          Sets fail threshold for Snyk 
+          (low | medium | high | critical)
+        required: true
+        default: "high"
+
+env:
+  PROJECT_NAME: "online-boutique"
+  SNYK_FAIL_THRESHOLD: "high"
+
+jobs:
+  source-code-security-check:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - project_name: cartservice
+            project_language: dotnet
+          - project_name: checkoutservice
+            project_language: golang
+          - project_name: currencyservice
+            project_language: node
+          - project_name: emailservice
+            project_language: python
+          - project_name: frontend
+            project_language: golang
+          - project_name: paymentservice
+            project_language: node
+          - project_name: productcatalogservice
+            project_language: golang
+          - project_name: recommendationservice
+            project_language: python
+          - project_name: shippingservice
+            project_language: golang
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+
+      - name: Install Snyk
+        uses: snyk/actions/setup@master
+
+      - name: Setup dotnet
+        if: ${{ matrix.project_language == 'dotnet' }}
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '6.0'
+
+      - name: Restore dotnet project dependencies
+        if: ${{ matrix.project_language == 'dotnet' }}
+        run: dotnet restore
+        working-directory: "src/${{ matrix.project_name }}"
+      
+      - name: Set up Python env
+        if: ${{ matrix.project_language == 'python' }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.7"
+      
+      - name: Install Python project dependencies
+        if: ${{ matrix.project_language == 'python' }}
+        run: pip install -r requirements.txt
+        working-directory: "src/${{ matrix.project_name }}"
+
+      - name: Check application source code for vulnerabilities
+        run: |
+          # Cartservice is an exception regarding project layout
+          # It uses a nested src subfolder - `src/cartservice/src`
+          if [[ "${{ matrix.project_name }}" == "cartservice" ]]; then
+            cd src/
+          fi
+          snyk code test \
+            --severity-threshold=${{ github.event.inputs.snyk_fail_threshold || env.SNYK_FAIL_THRESHOLD }}
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        working-directory: "src/${{ matrix.project_name }}"
+      
+      - name: Check 3rd party source code for vulnerabilities
+        run: |
+          # Cartservice is an exception regarding project layout 
+          # It uses a nested src subfolder - `src/cartservice/src`
+          if [[ "${{ matrix.project_name }}" == "cartservice" ]]; then
+            cd src/
+          fi
+          snyk test \
+            --severity-threshold=${{ github.event.inputs.snyk_fail_threshold || env.SNYK_FAIL_THRESHOLD }} \
+            --project-name=${{ env.PROJECT_NAME }} \
+            --target-reference=${{ matrix.project_name }}
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        working-directory: "src/${{ matrix.project_name }}"
