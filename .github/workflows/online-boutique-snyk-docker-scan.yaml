@@ -1,0 +1,73 @@
+name: Online Boutique Snyk Docker Scan
+
+on:
+  # pull_request:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - "src/**/Dockerfile"
+
+  # Below configuration is used for manual workflow dispatch
+  workflow_dispatch:
+    inputs:
+      snyk_fail_threshold:
+        description: |
+          Sets fail threshold for Snyk 
+          (low | medium | high | critical)
+        required: true
+        default: "high"
+
+env:
+  DOCR_ENDPOINT: "registry.digitalocean.com/microservices-demo"
+  PROJECT_NAME: "online-boutique"
+  SNYK_FAIL_THRESHOLD: "high"
+
+jobs:
+  container-security-check:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        project:
+          - cartservice
+          - checkoutservice
+          - currencyservice
+          - emailservice
+          - frontend
+          - paymentservice
+          - productcatalogservice
+          - recommendationservice
+          - shippingservice
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+
+      - name: Install Snyk
+        uses: snyk/actions/setup@master
+
+      - name: Build app image for Snyk container scanning
+        uses: docker/build-push-action@v3
+        with:
+          # Cartservice is an exception - Dockerfile is placed in `src/cartservice/src` subfolder
+          context: "src/${{ matrix.project }}/${{ matrix.project == 'cartservice' && 'src' || ''}}"
+          push: false
+          tags: "${{ env.DOCR_ENDPOINT }}/${{ matrix.project }}:${{ github.event.pull_request.head.sha }}"
+
+      - name: Check application container vulnerabilities
+        run: |
+          # Cartservice is an exception regarding project layout
+          # It uses a nested src subfolder - `src/cartservice/src`
+          if [[ "${{ matrix.project }}" == "cartservice" ]]; then
+            cd src/
+          fi
+          snyk container test "${{ env.DOCR_ENDPOINT }}/${{ matrix.project }}:${{ github.event.pull_request.head.sha }}" \
+            --file=Dockerfile \
+            --severity-threshold=${{ github.event.inputs.snyk_fail_threshold || env.SNYK_FAIL_THRESHOLD }} \
+            --target-name=${{ env.PROJECT_NAME }} \
+            --target-reference=${{ matrix.project }}
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        working-directory: "src/${{ matrix.project }}"
