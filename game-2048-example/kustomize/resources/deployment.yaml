@@ -18,7 +18,7 @@ spec:
       containers:
         - name: backend
           # Replace the `<>` placeholders with your docker registry info
-          image: registry.digitalocean.com/<YOUR_DOCKER_REGISTRY_NAME_HERE>/2048-game:latest
+          image: devsawant85/game-app:v1
           ports:
             - name: http
               containerPort: 8080
